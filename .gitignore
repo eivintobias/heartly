@@ -1,0 +1,27 @@
+# Large checkpoint zip files
+*.zip
+
+# GGUF model weights (too large for GitHub — upload to Hugging Face instead)
+*.gguf
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Environment
+.env
+venv/
+.venv/
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# llama.cpp build artifacts
+llama.cpp/build/
+llama.cpp/bin/
+llama.cpp/lib/
