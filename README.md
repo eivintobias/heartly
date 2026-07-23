@@ -10,6 +10,19 @@ The core idea is that hallucination is not primarily a knowledge problem — it'
 
 ---
 
+## 🧪 Latest Research — Track 2: Absence Sensors on RNN States (July 2026)
+
+New since v2: the project has a second research track — **boundary heads and independent critics on recurrent models** (RWKV, Falcon-H1) that read the model's own state to detect when it doesn't know.
+
+- **[heartly-rnn/RESULTS.md](heartly-rnn/RESULTS.md)** — the full experiment record:
+  - **Stage 1:** recurrent states read known/unknown at **AUROC 1.000** (2,902 true-boundary questions)
+  - **Stage 2:** RWKV-430m fine-tuned on the Heartly grammar — 100% grammar adoption, 97.7% decide accuracy… but the boundary head is blind to *confident* confabulation
+  - **Stage 2.5:** an independent critic fixes the blind spot in principle, but fails the pre-registered bar at 0.5B scale. Lesson: **the critic must be stronger than the generator**
+- **[research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md](research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md)** — Research Paper II: the full program (boundary error, negative-side mechanisms, memory track)
+- **[research_papers/plain/](research_papers/plain/)** — plain-language copies of all papers
+
+---
+
 ## The Architecture
 
 Heartly uses three special token mechanics in its output grammar:
