@@ -1,0 +1,83 @@
+{
+  "data": "critic_data.jsonl",
+  "n_labeled": 51,
+  "n_train": 40,
+  "n_test": 11,
+  "pass_bar": "detection >= 0.70 & false_flag <= 0.05 & tracked >= 4/5",
+  "critics": [
+    {
+      "name": "A_qwen_transcript",
+      "best_layer_slot": 0,
+      "auroc": 0.5,
+      "threshold": 0.076915442943573,
+      "detection": 0.0,
+      "false_flag": 0.0,
+      "n_test": 11,
+      "n_confab": 10,
+      "n_correct": 1,
+      "tracked_n": 0,
+      "tracked_caught": 0,
+      "tracked_detail": [],
+      "per_generator": {
+        "squad": {
+          "conf_n": 6,
+          "conf_caught": 0,
+          "corr_n": 1,
+          "corr_flagged": 0
+        },
+        "trivia_qa": {
+          "conf_n": 4,
+          "conf_caught": 0,
+          "corr_n": 0,
+          "corr_flagged": 0
+        }
+      },
+      "layers_probed": [
+        0,
+        6,
+        12,
+        18,
+        23
+      ],
+      "probed_layer": 0,
+      "pass": false
+    },
+    {
+      "name": "B_rwkv_late",
+      "best_layer_slot": 0,
+      "auroc": 0.7,
+      "threshold": 0.9239968657493591,
+      "detection": 0.9,
+      "false_flag": 1.0,
+      "n_test": 11,
+      "n_confab": 10,
+      "n_correct": 1,
+      "tracked_n": 0,
+      "tracked_caught": 0,
+      "tracked_detail": [],
+      "per_generator": {
+        "squad": {
+          "conf_n": 6,
+          "conf_caught": 6,
+          "corr_n": 1,
+          "corr_flagged": 1
+        },
+        "trivia_qa": {
+          "conf_n": 4,
+          "conf_caught": 3,
+          "corr_n": 0,
+          "corr_flagged": 0
+        }
+      },
+      "layers_probed": [
+        0,
+        6,
+        12,
+        18,
+        23
+      ],
+      "probed_layer": 0,
+      "pass": false
+    }
+  ]
+}

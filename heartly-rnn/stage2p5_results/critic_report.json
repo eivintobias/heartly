@@ -1,0 +1,193 @@
+{
+  "data": "critic_data.jsonl",
+  "n_labeled": 1515,
+  "n_train": 1208,
+  "n_test": 307,
+  "pass_bar": "detection >= 0.70 & false_flag <= 0.05 & tracked >= 4/5",
+  "critics": [
+    {
+      "name": "A_qwen_transcript",
+      "best_layer_slot": 3,
+      "auroc": 0.7581920903954802,
+      "threshold": 0.3271903097629547,
+      "detection": 0.9932203389830508,
+      "false_flag": 0.9166666666666666,
+      "n_test": 307,
+      "n_confab": 295,
+      "n_correct": 12,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 1331,
+          "question": "What is the temporal cognition theory proposed by Dr. Imogen Almeida?",
+          "p_correct": 0.07386656850576401,
+          "flagged": true
+        },
+        {
+          "id": 1460,
+          "question": "What is the unpublished formula for Gore-Tex laminate?",
+          "p_correct": 0.0021498932037502527,
+          "flagged": true
+        },
+        {
+          "id": 1616,
+          "question": "Which country celebrated after the 2026 Australian Open men's singles final?",
+          "p_correct": 0.00878871139138937,
+          "flagged": true
+        },
+        {
+          "id": 1670,
+          "question": "Do you know my first pet's name?",
+          "p_correct": 0.00017548419418744743,
+          "flagged": true
+        },
+        {
+          "id": 2797,
+          "question": "What is the reverse genetics theory proposed by Dr. Anatoly Baranova?",
+          "p_correct": 0.005327650345861912,
+          "flagged": true
+        }
+      ],
+      "per_generator": {
+        "fabricated": {
+          "conf_n": 5,
+          "conf_caught": 5,
+          "corr_n": 0,
+          "corr_flagged": 0
+        },
+        "trivia_qa": {
+          "conf_n": 152,
+          "conf_caught": 150,
+          "corr_n": 6,
+          "corr_flagged": 6
+        },
+        "squad": {
+          "conf_n": 126,
+          "conf_caught": 126,
+          "corr_n": 6,
+          "corr_flagged": 5
+        },
+        "post_cutoff": {
+          "conf_n": 7,
+          "conf_caught": 7,
+          "corr_n": 0,
+          "corr_flagged": 0
+        },
+        "depth2": {
+          "conf_n": 1,
+          "conf_caught": 1,
+          "corr_n": 0,
+          "corr_flagged": 0
+        },
+        "structural": {
+          "conf_n": 4,
+          "conf_caught": 4,
+          "corr_n": 0,
+          "corr_flagged": 0
+        }
+      },
+      "layers_probed": [
+        0,
+        6,
+        12,
+        18,
+        23
+      ],
+      "probed_layer": 18,
+      "pass": false
+    },
+    {
+      "name": "B_rwkv_late",
+      "best_layer_slot": 2,
+      "auroc": 0.794915254237288,
+      "threshold": 0.9137041568756104,
+      "detection": 1.0,
+      "false_flag": 1.0,
+      "n_test": 307,
+      "n_confab": 295,
+      "n_correct": 12,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 1331,
+          "question": "What is the temporal cognition theory proposed by Dr. Imogen Almeida?",
+          "p_correct": 0.04906651750206947,
+          "flagged": true
+        },
+        {
+          "id": 1460,
+          "question": "What is the unpublished formula for Gore-Tex laminate?",
+          "p_correct": 0.00012158581375842914,
+          "flagged": true
+        },
+        {
+          "id": 1616,
+          "question": "Which country celebrated after the 2026 Australian Open men's singles final?",
+          "p_correct": 0.0007577903452329338,
+          "flagged": true
+        },
+        {
+          "id": 1670,
+          "question": "Do you know my first pet's name?",
+          "p_correct": 0.00020235466945450753,
+          "flagged": true
+        },
+        {
+          "id": 2797,
+          "question": "What is the reverse genetics theory proposed by Dr. Anatoly Baranova?",
+          "p_correct": 4.542701208265498e-05,
+          "flagged": true
+        }
+      ],
+      "per_generator": {
+        "fabricated": {
+          "conf_n": 5,
+          "conf_caught": 5,
+          "corr_n": 0,
+          "corr_flagged": 0
+        },
+        "trivia_qa": {
+          "conf_n": 152,
+          "conf_caught": 152,
+          "corr_n": 6,
+          "corr_flagged": 6
+        },
+        "squad": {
+          "conf_n": 126,
+          "conf_caught": 126,
+          "corr_n": 6,
+          "corr_flagged": 6
+        },
+        "post_cutoff": {
+          "conf_n": 7,
+          "conf_caught": 7,
+          "corr_n": 0,
+          "corr_flagged": 0
+        },
+        "depth2": {
+          "conf_n": 1,
+          "conf_caught": 1,
+          "corr_n": 0,
+          "corr_flagged": 0
+        },
+        "structural": {
+          "conf_n": 4,
+          "conf_caught": 4,
+          "corr_n": 0,
+          "corr_flagged": 0
+        }
+      },
+      "layers_probed": [
+        0,
+        6,
+        12,
+        18,
+        23
+      ],
+      "probed_layer": 12,
+      "pass": false
+    }
+  ]
+}

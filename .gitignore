@@ -25,3 +25,25 @@ Thumbs.db
 llama.cpp/build/
 llama.cpp/bin/
 llama.cpp/lib/
+
+# Model weights & training state (large binaries — keep on disk, not in git)
+*.pt
+*.pth
+*.safetensors
+*.npz
+*.npy
+*.bin
+*.ckpt
+
+# Third-party tooling clone (not project code)
+llama.cpp/
+
+# Training checkpoint weight dirs (weights/optimizer state — too large; weights live on Hugging Face)
+checkpoint-3807/
+checkpoint-33500/checkpoint-33500/
+heartly-v3/checkpoint-9000/
+
+# Error logs and misc clutter
+*.err
+*- Copy.txt
+research_papers/_read_chat.py

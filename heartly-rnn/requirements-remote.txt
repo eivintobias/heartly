@@ -1,0 +1,11 @@
+# Remote (vast.ai GPU instance) requirements — torch intentionally EXCLUDED:
+# the instance's PyTorch image already ships the CUDA-enabled build; letting
+# pip install torch here would clobber it with a CPU build.
+transformers>=4.44
+datasets>=2.19
+scikit-learn>=1.4
+numpy>=1.26
+tqdm>=4.66
+sentencepiece
+tiktoken
+accelerate>=1.1
