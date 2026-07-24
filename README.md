@@ -18,7 +18,8 @@ New since v2: the project has a second research track — **boundary heads and i
   - **Stage 1:** recurrent states read known/unknown at **AUROC 1.000** (2,902 true-boundary questions)
   - **Stage 2:** RWKV-430m fine-tuned on the Heartly grammar — 100% grammar adoption, 97.7% decide accuracy… but the boundary head is blind to *confident* confabulation
   - **Stage 2.5:** an independent critic fixes the blind spot in principle, but fails the pre-registered bar at 0.5B scale. Lesson: **the critic must be stronger than the generator**
-  - **Stage 3 (2026-07-23):** the recipe scales — **RWKV7-Goose-1.5B** fine-tuned in ~15 min on a single 3090: grammar 100%, decide accuracy **100%**, boundary head **AUROC 1.000 at every probed layer**, say/sense agreement 100%
+  - **Stage 3 (2026-07-23):** the recipe scales — **RWKV7-Goose-1.5B** fine-tuned in ~15 min on a single 3090: grammar 100%, decide accuracy **100%**, boundary head **AUROC 1.000 at every probed layer**, say/sense agreement 100% — published: [eivintobias/heartly-rwkv7-1.5b](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b)
+  - **Stage 2.6 (2026-07-24):** the asymmetry requirement, measured — critics of growing size grade the 0.43B generator's answers: AUROC 0.758 (0.5B) → 0.826 (1.5B) → 0.845 (3B). The deployment bar still fails — provably because the starved 60-sample correct class leaves no operating point — and a bonus finding: at 7× asymmetry the critic turns *over-strict*, distrusting even correct answers
 - **[research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md](research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md)** — Research Paper II: the full program (boundary error, negative-side mechanisms, memory track)
 - **[research_papers/plain/](research_papers/plain/)** — plain-language copies of all papers
 
