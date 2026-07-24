@@ -1,8 +1,13 @@
 # Remote (vast.ai GPU instance) requirements — torch intentionally EXCLUDED:
 # the instance's PyTorch image already ships the CUDA-enabled build; letting
 # pip install torch here would clobber it with a CPU build.
-transformers>=4.44
+# fla 0.5.x is built for transformers 4.x — v5 breaks its Cache + fused CE
+# (smoke test 2026-07-23: FLALayer 'get_max_length' + L2WrapBackward view errors)
+transformers==4.56.2
 datasets>=2.19
+# RWKV7-Goose ships a shim modeling file that imports fla (Linux + triton only;
+# do NOT install on the Windows machines)
+flash-linear-attention>=0.3
 scikit-learn>=1.4
 numpy>=1.26
 tqdm>=4.66

@@ -40,9 +40,10 @@ def collate(batch, tok, max_length=768):
 
 
 def freeze_bottom_blocks(model, freeze_n):
-    """Freeze blocks with index < freeze_n (name-based, defensive)."""
+    """Freeze blocks with index < freeze_n (name-based, defensive).
+    rwkv-4 custom code uses 'blocks.N.'; fla RWKV7 uses 'layers.N.'."""
     frozen = 0
-    pat = re.compile(r"blocks\.(\d+)\.")
+    pat = re.compile(r"(?:blocks|layers)\.(\d+)\.")
     for name, p in model.named_parameters():
         m = pat.search(name)
         if m and int(m.group(1)) < freeze_n:
@@ -66,6 +67,8 @@ def main():
     ap.add_argument("--freeze-layers", type=int, default=16)
     ap.add_argument("--max-length", type=int, default=768)
     ap.add_argument("--limit", type=int, default=0, help="debug: first N samples")
+    ap.add_argument("--dtype", default="fp32", choices=["fp32", "bf16", "fp16"],
+                    help="fla RWKV7 kernels want bf16/fp16; fp32 warns/falls back")
     args = ap.parse_args()
 
     rows = [json.loads(l) for l in open(args.data, encoding="utf-8")]
@@ -74,8 +77,15 @@ def main():
     print(f"{len(rows)} training samples")
 
     tok = AutoTokenizer.from_pretrained(args.repo, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(args.repo, dtype=torch.float32,
+    _dt = {"fp32": torch.float32, "bf16": torch.bfloat16,
+           "fp16": torch.float16}[args.dtype]
+    model = AutoModelForCausalLM.from_pretrained(args.repo, dtype=_dt,
                                                  trust_remote_code=True)
+    # fla's fused linear cross-entropy returns a view that transformers v5's
+    # Trainer then modifies in place (loss *= scale) -> RuntimeError. Disable.
+    if getattr(model.config, "fuse_cross_entropy", False):
+        model.config.fuse_cross_entropy = False
+        print("fla fused cross-entropy disabled (Trainer-incompatible)")
     if getattr(tok, "pad_token", None) is None:
         tok.pad_token = getattr(tok, "eos_token", None)
     freeze_bottom_blocks(model, args.freeze_layers)

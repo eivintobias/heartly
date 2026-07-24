@@ -47,3 +47,7 @@ heartly-v3/checkpoint-9000/
 *.err
 *- Copy.txt
 research_papers/_read_chat.py
+
+# Download chunk files (reassembled into model weights locally)
+*.part0*
+heartly-rnn/heartly-rnn-stage*.zip

@@ -338,3 +338,61 @@ hypothesis directly on existing data); (3) then Stage 3 (state persistence).
 **Artifacts.** `critic_data.jsonl` (2,902 rows), `stage2p5_results/`
 (critic_A_qwen_transcript.pkl, critic_B_rwkv_late.pkl, critic_report.json,
 feature caches), `analyze_critic.py` (operating-curve readout).
+
+---
+# Stage 3 — RWKV7-Goose-1.5B fine-tune (2026-07-23, vast.ai instance 45634549)
+
+Same recipe as Stage 2, generator scaled 0.43B → 1.5B. Motivation (Stage 2.5
+finding 5): at 0.43B the correct class is 4.1% populated — every downstream
+measurement starves for correct answers. Same 6,031 SFT samples, 2 epochs,
+754 steps.
+
+**Stack (new):** `RWKV/RWKV7-Goose-World3-1.5B-HF` via fla 0.5.1 (flash-linear-
+attention, triton chunk kernels) — no native transformers support. Pinned
+**transformers 4.56.2**: v5 breaks fla's Cache (`FLALayer.get_max_length`),
+its fused CE (`L2WrapBackward` view vs Trainer's inplace `loss *=`), and
+save_pretrained's tokenizer round-trip. Training in **bf16** (fla kernels
+don't support fp32), fused CE disabled. Frozen 16/24 layers (527 tensors,
+688M/1,527M trainable), batch 4 × accum 4, max-length 256.
+
+**Speed:** steady-state **1.25 s/step** → ~15 min for the full fine-tune
+(Stage 2's pure-Python recurrence took ~6 h for the same job at 0.43B).
+Final loss ~0.8.
+
+**Results (measure_say_sense, 1,200 head samples + 300 held-out questions):**
+
+| metric | Stage 2 (0.43B) | Stage 3 (1.5B) |
+|---|---|---|
+| grammar adoption (parsed verify) | 100% (300/300) | **100% (300/300)** |
+| decide accuracy (say vs true) | 97.7% | **100%** |
+| boundary head AUROC (best layer) | 1.000 (layer 6) | **1.000 (all of 6/12/18/23)** |
+| sense accuracy vs true | 97.7% | **100%** |
+| say/sense agreement | 100% | **100%** |
+| confabulations caught (blind spot) | 0 | 0 |
+
+Note the blind-spot row: 0 caught here means no confident confabulation
+*appeared* in the 300-question eval — expected, since say accuracy was 100%
+(the unknown-side generators are knowingly unknowable for a 1.5B). Content
+accuracy on spoken knowns (the 4.1% question) is NOT measured by say/sense —
+that is the critic-harvest number, next step.
+
+**Engineering notes (all patched + committed):** freeze regex now matches
+fla's `layers.N.` (was `blocks.N.`); `extract_states.forward_features` reads
+fla's `FLALayer.state` dict (`recurrent_state` key) in addition to the v5
+DynamicCache layout; `measure_say_sense.py --tokenizer-repo` (the fine-tuned
+dir's saved tokenizer is broken — load from the base repo); the saved model
+dir needs `modeling_rwkv7.py` + vocab copied in manually. fla warns its RWKV
+implementation is "potentially buggy — cross-check with official repo"
+(caveat for the paper; it is the only practical path).
+
+**Decision: Stage 3 confirms the recipe scales — grammar, decide, and sense
+are all at ceiling at 1.5B.** Next: (1) critic harvest on this generator
+(`gen_critic_data.py --model rwkv7-heartly`, 2,902 questions) → the content-
+accuracy number at 1.5B; (2) asymmetric critic (Qwen2.5-1.5B/3B features on
+those transcripts) — direct test of the Stage 2.5 asymmetry requirement;
+(3) Stage 4 memory/state persistence.
+
+**Artifacts.** `stage3_results/rwkv7-heartly/` (1.5B bf16 fine-tune),
+`stage3_results/probe_head_rwkv7.pkl`, `stage3_results/say_sense_report_rwkv7.json`,
+`stage3_results/{run3b,measure,smoke_rwkv7}.log`, `smoke_rwkv7.py`,
+`run_stage3_rwkv7.sh` / `run_stage3b.sh`.

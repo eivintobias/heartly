@@ -86,11 +86,22 @@ def forward_features(family, model, enc, layer_idx):
             if i >= len(layers):
                 continue
             rs = getattr(layers[i], "recurrent_states", None)
+            if not (isinstance(rs, dict) and rs):
+                # fla (RWKV7): FLALayer.state is a dict, e.g.
+                # {'recurrent_state': (batch, heads, k, v), 'conv_state': ...}
+                rs = getattr(layers[i], "state", None)
             if isinstance(rs, dict) and rs:
-                t = torch.cat([v.detach().cpu() for v in rs.values()], dim=0)
-                # pool the head_dim axis of (batch, heads, head_dim, state) ->
-                # (heads, state): keeps head x state structure, bounds file size
-                sel.append(t.float().mean(dim=-2).reshape(-1).numpy().astype(np.float16))
+                parts = []
+                for v in rs.values():
+                    if not torch.is_tensor(v):
+                        continue
+                    v = v.detach().cpu().float()
+                    # pool the head_dim axis of (batch, heads, head_dim, state)
+                    # -> keeps head x state structure, bounds feature size
+                    v = v.mean(dim=-2) if v.ndim >= 3 else v
+                    parts.append(v.reshape(-1))
+                if parts:
+                    sel.append(torch.cat(parts).numpy().astype(np.float16))
         if sel:
             rstate = np.stack(sel)
     else:

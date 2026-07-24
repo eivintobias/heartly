@@ -3,16 +3,17 @@
 Read this first in a fresh chat. Everything you need to continue without the
 previous 500k-token conversation.
 
-> **LIVE STATE (2026-07-22 20:00):** Stage 2.5 COMPLETE — harvest + both
-> critics trained + results written (RESULTS.md Stage 2.5 section, paper
-> §7A). Verdict vs pre-registered bar: FAIL (A 42% / B 25% detection at 5%
-> FPR) — but detection principle confirmed (tracked 5/5 score ~0.000) and
-> the asymmetry requirement derived: critic must be STRONGER than the
-> generator. NEXT: RWKV7-Goose-1.5B fine-tune (needs fresh vast.ai 24GB
-> instance, ~$3–6; scripts repo-agnostic — just swap --repo), then
-> asymmetric critic (Qwen2.5-1.5B/3B on existing transcripts, inference-
-> only, runs locally incl. on the desktop GPU). vast.ai instance 45426253:
-> DESTROYED (user-confirmed 2026-07-21).
+> **LIVE STATE (2026-07-24 02:15):** Stage 3 COMPLETE — RWKV7-Goose-1.5B
+> fine-tuned + measured (RESULTS.md Stage 3 section): grammar 100%,
+> decide 100% (was 97.7%), boundary head AUROC 1.000 at all probed layers,
+> say/sense agreement 100%. Fine-tune took ~15 min on a 3090 (fla triton
+> kernels vs 6 h pure-python rwkv-4). Stack notes: fla 0.5.1 + pinned
+> transformers 4.56.2 (v5 incompatible), bf16, fused CE off, 16/24 layers
+> frozen. Artifacts in `heartly-rnn/stage3_results/` (model 3GB bf16,
+> probe head, say/sense report, logs). vast.ai instance 45634549 served
+> its purpose — DESTROY when confirmed. NEXT: critic harvest on the 1.5B
+> (gen_critic_data.py → content accuracy at scale, the 4.1% question),
+> then asymmetric critic (Qwen2.5-1.5B/3B on those transcripts).
 
 ---
 
@@ -160,10 +161,26 @@ HF: huggingface.co/eivintobias/heartly-v2.
 - CPU greedy generation RWKV-430m fp32 ≈ 10 s/question (120-token cap, early
   stop at <stop>). 2,902 questions ≈ 8–11 h. Plan runs accordingly (or GPU).
 - **User also has a desktop:** RTX 2080 Ti 11GB (Turing sm_75 — fp16 OK,
-  bf16 emulated/slow), 32GB RAM, i7-6700K. Good for: critic iterations,
-  1.5B *inference/probing* (fp16 ~3GB), RWKV-430m fine-tune (tight, needs
-  batch 2 × accum 8). NOT enough for 1.5B training (still vast.ai 24GB).
-  The i7-6700K is no faster than the laptop CPU for CPU-only work.
+  bf16 emulated/slow), 32GB RAM, i7-6700K. Desktop env (2026-07-23):
+  Python 3.10.9, torch 2.5.1+cu124 (CUDA works), transformers **5.3.0**.
+  NOT enough for 1.5B training (still vast.ai 24GB).
+- **RWKV7 loading (2026-07-23):** `RWKV/RWKV7-Goose-World3-1.5B-HF` has NO
+  native support in transformers v5 — its modeling_rwkv7.py is a shim for
+  `fla.models.rwkv7` → requires `pip install flash-linear-attention`
+  (pulls triton; Linux only, do NOT try on Windows). Tokenizer = same RWKV
+  world vocab as rwkv-4 (rwkv_vocab_v20230424.txt) → `<stop>` ids and
+  string-offset tricks carry over. Config: 24 layers, hidden 2048, vocab
+  65536, tie_word_embeddings=false.
+- **vast.ai SSH (SOLVED 2026-07-23):** past failures = the private key only
+  existed on the laptop. Desktop now has its own ed25519 key
+  (`C:\Users\eivin\.ssh\id_ed25519`, "heartly-vast-desktop") on the account.
+  Keys inject only at instance CREATION; for existing instances use the
+  instance-card key-attach. Auth can fail for the first ~60s after boot —
+  just retry. Proxy SSH drops connections intermittently — keep commands
+  SHORT; long-lived sessions (sleep+tail) get killed. New base image:
+  python env at `/venv/main` (activate first!), HF_HOME=/workspace/.hf_home.
+  Instance 45634549 (RTX 3090, 154.64.230.50 port 50486) RUNNING the
+  Stage-3 RWKV7-1.5B pipeline as of 2026-07-23 evening — destroy when done.
 
 ## 6. Next actions (ordered)
 

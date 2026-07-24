@@ -35,9 +35,10 @@ VERIFY_RE = re.compile(r"<verify>\s*(known|unknown)\s*</verify>")
 HEAD_LAYERS = [6, 12, 18, 23]
 
 
-def load_model(path):
+def load_model(path, tokenizer_repo=None):
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    tok = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
+    tok = AutoTokenizer.from_pretrained(tokenizer_repo or path,
+                                        trust_remote_code=True)
     model = AutoModelForCausalLM.from_pretrained(path, dtype=torch.float32,
                                                  trust_remote_code=True)
     model.eval()
@@ -148,6 +149,9 @@ def generate(tok, model, prompt, max_new):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="rwkv-heartly")
+    ap.add_argument("--tokenizer-repo", default=None,
+                    help="load tokenizer from a different repo/dir (e.g. the "
+                         "base repo when save_pretrained wrote a broken tokenizer)")
     ap.add_argument("--questions", default="probe_questions.jsonl")
     ap.add_argument("--head-samples", type=int, default=1200)
     ap.add_argument("--eval-limit", type=int, default=200)
@@ -158,7 +162,7 @@ def main():
     args = ap.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    tok, model = load_model(args.model)
+    tok, model = load_model(args.model, args.tokenizer_repo)
     rng = random.Random(args.seed)
 
     print("== phase 1: boundary head ==")
