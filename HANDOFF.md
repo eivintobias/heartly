@@ -100,7 +100,10 @@ HF: huggingface.co/eivintobias/heartly-v2.
   (6/12/18/23)**, say/sense agreement 100%. Blind spot untouched as expected
   (needs content-reading critic). Full writeup: RESULTS.md Stage 3.
   Artifacts: `heartly-rnn/stage3_results/` (rwkv7-heartly 3GB bf16, probe
-  head, say/sense report, logs).
+  head, say/sense report, logs). **PUBLISHED on HF 2026-07-24:
+  huggingface.co/eivintobias/heartly-rwkv7-1.5b** (model + probe head +
+  card w/ fla+transformers-4.56.2 loading caveats; tokenizer + custom-code
+  files pulled from the base repo — night-scp had missed them).
 
 ## 3. Core concepts (don't re-derive)
 
