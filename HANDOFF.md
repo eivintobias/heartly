@@ -10,10 +10,11 @@ previous 500k-token conversation.
 > kernels vs 6 h pure-python rwkv-4). Stack notes: fla 0.5.1 + pinned
 > transformers 4.56.2 (v5 incompatible), bf16, fused CE off, 16/24 layers
 > frozen. Artifacts in `heartly-rnn/stage3_results/` (model 3GB bf16,
-> probe head, say/sense report, logs). vast.ai instance 45634549 served
-> its purpose — DESTROY when confirmed. NEXT: critic harvest on the 1.5B
-> (gen_critic_data.py → content accuracy at scale, the 4.1% question),
-> then asymmetric critic (Qwen2.5-1.5B/3B on those transcripts).
+> probe head, say/sense report, logs). vast.ai instance 45634549:
+> DESTROYED (user-confirmed 2026-07-24). NEXT: critic harvest on the 1.5B
+> (gen_critic_data.py → content accuracy at scale, the 4.1% question —
+> needs a Linux GPU: fla/triton don't run on Windows), then asymmetric
+> critic (Qwen2.5-1.5B/3B on those transcripts — desktop GPU fine).
 
 ---
 
@@ -90,6 +91,16 @@ HF: huggingface.co/eivintobias/heartly-v2.
   Artifacts: `critic_data.jsonl`, `stage2p5_results/`, `analyze_critic.py`.
   Scripts: `gen_critic_data.py`, `train_critic.py`, `inspect_critic_data.py`.
   Full writeup: RESULTS.md Stage 2.5 + paper §7A.
+- **Track 2 Stage 3** (2026-07-23, COMPLETE) — RWKV7-Goose-1.5B fine-tuned on
+  the same 6,031 samples (2 epochs, 754 steps, ~15 min on vast.ai 3090, ~$2 —
+  fla triton chunk kernels vs 6h pure-python rwkv-4). Stack: fla 0.5.1 +
+  **transformers 4.56.2 pinned** (v5 incompatible), bf16, fused CE off,
+  16/24 layers frozen. Results: grammar adoption **100%**, decide accuracy
+  **100%** (was 97.7%), boundary head **AUROC 1.000 at all probed layers
+  (6/12/18/23)**, say/sense agreement 100%. Blind spot untouched as expected
+  (needs content-reading critic). Full writeup: RESULTS.md Stage 3.
+  Artifacts: `heartly-rnn/stage3_results/` (rwkv7-heartly 3GB bf16, probe
+  head, say/sense report, logs).
 
 ## 3. Core concepts (don't re-derive)
 
@@ -179,30 +190,36 @@ HF: huggingface.co/eivintobias/heartly-v2.
   just retry. Proxy SSH drops connections intermittently — keep commands
   SHORT; long-lived sessions (sleep+tail) get killed. New base image:
   python env at `/venv/main` (activate first!), HF_HOME=/workspace/.hf_home.
-  Instance 45634549 (RTX 3090, 154.64.230.50 port 50486) RUNNING the
-  Stage-3 RWKV7-1.5B pipeline as of 2026-07-23 evening — destroy when done.
+  Instance 45634549 (RTX 3090) ran the Stage-3 pipeline 2026-07-23 —
+  DESTROYED (user-confirmed 2026-07-24). Rent fresh for the critic harvest
+  (RWKV7 needs fla/triton → Linux only; desktop Windows can't load it).
+  Big-file downloads: python http.server has NO Range support → curl -C -
+  never finishes; split ≤64MB + per-chunk retry loop instead.
 
 ## 6. Next actions (ordered)
 
 1. ~~Finish Stage 2.5~~ DONE (2026-07-22): critics FAIL the bar at 0.5B;
    detection principle confirmed; asymmetry requirement derived.
-2. **Scale generator to RWKV7-Goose-1.5B** (`RWKV/RWKV7-Goose-World3-1.5B-HF`,
-   untested locally) — same recipe, scripts repo-agnostic (finetune_rwkv.py
-   --repo, then measure_say_sense.py, gen_critic_data.py, train_critic.py).
-   Populates the correct class (4.1% at 0.43B is the bottleneck everywhere).
-   Needs fresh vast.ai 24GB instance (~$3–6 + upload time). First: smoke-test
-   the repo loads in transformers 5.14.1 (10 min, local).
-3. **Asymmetric critic** (cheap, local, uses EXISTING transcripts): critic A
-   with Qwen2.5-1.5B/3B hidden features on critic_data.jsonl — tests the
-   asymmetry hypothesis directly. train_critic.py --critic-a-repo
-   Qwen/Qwen2.5-1.5B --skip-b. Desktop GPU is ideal (fp16).
-4. **Stage 3 — state persistence**: save/load RWKV recurrent state across
-   sessions; measure continuity ("waking with yesterday's gist"). CPU-fine.
-5. **Qwen v4 run** (Track 1, parked): the `Heartly_V4/` notebook plan —
+2. ~~Scale generator to RWKV7-Goose-1.5B~~ DONE (2026-07-23): grammar 100%,
+   decide 100%, head AUROC 1.000 all layers, ~$2, ~15 min train. Instance
+   45634549 destroyed 2026-07-24. See RESULTS.md Stage 3.
+3. **Critic harvest on the 1.5B** (NEXT): gen_critic_data.py
+   --model heartly-rnn/stage3_results/rwkv7-heartly
+   --tokenizer-repo RWKV/RWKV7-Goose-World3-1.5B-HF over 2,902 questions →
+   content accuracy at 1.5B (the 4.1%-at-0.43B question). NEEDS Linux GPU
+   (fla/triton; desktop Windows can't load the model) → fresh vast.ai
+   instance, bf16, ~2–4h. Then train_critic.py on the harvest.
+4. **Asymmetric critic** (cheap, local, EXISTING critic_data.jsonl):
+   train_critic.py --critic-a-repo Qwen/Qwen2.5-1.5B --skip-b — direct test
+   of the asymmetry requirement on the OLD 0.43B transcripts. Desktop GPU
+   (fp16), no fla needed (plain Qwen). Can run any time, independent of 3.
+5. **Stage 4 — memory/state persistence**: save/load RWKV7 recurrent state
+   across sessions ("waking with yesterday's gist"); then write-gate.
+6. **Qwen v4 run** (Track 1, parked): the `Heartly_V4/` notebook plan —
    kind-aware rendering + true-boundary mix on Qwen2.5-0.5B. Superseded-ish by
    Track 2 wins, but needed for the paper's Track-1 line.
-6. ~~Paper update~~ DONE (2026-07-22): §7A complete incl. Stage 2.5 verdict;
-   §5.4 critic un-shelved.
+7. ~~Paper update~~ DONE (2026-07-22): §7A complete incl. Stage 2.5 verdict;
+   §5.4 critic un-shelved. NEXT paper edit: add Stage 3 (§7B?) after harvest.
 
 ## 7. START PROMPT for the new chat (paste this)
 
@@ -210,9 +227,10 @@ HF: huggingface.co/eivintobias/heartly-v2.
 > grammar + boundary-head absence sensors on RNN states). Start by reading
 > HANDOFF.md in the workspace root — it has the full project state, file map,
 > environment gotchas, and next actions. Then read heartly-rnn/RESULTS.md —
-> the experiment record now includes Stage 2.5 (independent critic): verdict
-> FAIL vs the pre-registered bar at 0.5B, but detection principle confirmed
-> and the asymmetry requirement derived (critic must be STRONGER than the
-> generator). Next up per HANDOFF §6: RWKV7-Goose-1.5B fine-tune (vast.ai),
-> or the cheap local asymmetric-critic test first. Read files before
-> proposing anything.
+> the record now includes Stage 3: RWKV7-Goose-1.5B fine-tuned (grammar 100%,
+> decide 100%, boundary head AUROC 1.000 at all probed layers), on top of
+> Stage 2.5's asymmetry requirement (critic must be STRONGER than the
+> generator). Next up per HANDOFF §6: critic harvest on the 1.5B (content
+> accuracy at scale — needs a Linux GPU box, fla/triton don't run on
+> Windows), then the asymmetric critic test (desktop GPU OK). Read files
+> before proposing anything.
