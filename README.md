@@ -2,7 +2,7 @@
 
 **Status:** Early Research Prototype (v2) — Not Production Ready
 
-**Model weights (GGUF):** [🤗 Hugging Face — eivintobias/heartly-v2](https://huggingface.co/eivintobias/heartly-v2)
+**Model weights:** [🤗 heartly-v2 — Qwen2.5-0.5B, GGUF (Track 1)](https://huggingface.co/eivintobias/heartly-v2) · [🤗 heartly-rwkv7-1.5b — RWKV7-1.5B + boundary head (Track 2)](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b)
 
 Heartly is an experimental small language model (0.5B parameters, based on Qwen2.5) that explores a novel approach to reducing hallucination: instead of training a model to *always answer*, we train it to **decide whether to speak**, **verify what it knows**, and **admit ignorance honestly**.
 
