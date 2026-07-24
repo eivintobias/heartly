@@ -18,6 +18,7 @@ New since v2: the project has a second research track — **boundary heads and i
   - **Stage 1:** recurrent states read known/unknown at **AUROC 1.000** (2,902 true-boundary questions)
   - **Stage 2:** RWKV-430m fine-tuned on the Heartly grammar — 100% grammar adoption, 97.7% decide accuracy… but the boundary head is blind to *confident* confabulation
   - **Stage 2.5:** an independent critic fixes the blind spot in principle, but fails the pre-registered bar at 0.5B scale. Lesson: **the critic must be stronger than the generator**
+  - **Stage 3 (2026-07-23):** the recipe scales — **RWKV7-Goose-1.5B** fine-tuned in ~15 min on a single 3090: grammar 100%, decide accuracy **100%**, boundary head **AUROC 1.000 at every probed layer**, say/sense agreement 100%
 - **[research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md](research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md)** — Research Paper II: the full program (boundary error, negative-side mechanisms, memory track)
 - **[research_papers/plain/](research_papers/plain/)** — plain-language copies of all papers
 
