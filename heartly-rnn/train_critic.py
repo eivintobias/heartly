@@ -51,7 +51,7 @@ def transcript(r):
 
 
 @torch.no_grad()
-def extract(family, repo, texts, ids, layers, cache_path, trust_remote):
+def extract(family, repo, texts, ids, layers, cache_path, trust_remote, dtype=None):
     """Final-token features per text; cached npz {ids, X}."""
     if os.path.exists(cache_path):
         z = np.load(cache_path)
@@ -60,7 +60,7 @@ def extract(family, repo, texts, ids, layers, cache_path, trust_remote):
             return z["X"]
         print("cache id mismatch, re-extracting")
     tok, model = load_family(family, repo, "cuda" if torch.cuda.is_available() else "cpu",
-                             trust_remote)
+                             trust_remote, dtype=dtype)
     X = []
     for t in tqdm(texts, desc=f"extract {family}"):
         enc = tok(t, return_tensors="pt").to(model.device)
@@ -156,6 +156,9 @@ def main():
     ap.add_argument("--skip-b", action="store_true")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--limit", type=int, default=0, help="debug: first N labeled rows")
+    ap.add_argument("--dtype", default="float32",
+                    choices=["float32", "float16", "bfloat16"],
+                    help="model load dtype (float16 for big critics on small VRAM)")
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -199,7 +202,8 @@ def main():
             or getattr(cfg, "n_layer", None) or getattr(cfg, "num_layers")
         layers = quartile_idx(n_layers_hint)
         print(f"layers probed: {layers}")
-        X = extract(family, repo, texts, ids, layers, cache, trust)
+        X = extract(family, repo, texts, ids, layers, cache, trust,
+                    dtype=getattr(torch, args.dtype))
         res, model_pkl = train_eval(name, X[tr_mask], ytr, X[te_mask], yte, test_rows)
         res["layers_probed"] = layers
         res["probed_layer"] = layers[res["best_layer_slot"]]

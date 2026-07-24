@@ -396,3 +396,91 @@ those transcripts) — direct test of the Stage 2.5 asymmetry requirement;
 `stage3_results/probe_head_rwkv7.pkl`, `stage3_results/say_sense_report_rwkv7.json`,
 `stage3_results/{run3b,measure,smoke_rwkv7}.log`, `smoke_rwkv7.py`,
 `run_stage3_rwkv7.sh` / `run_stage3b.sh`.
+
+---
+# Stage 2.6 — asymmetric critic: scale dose-response on the 0.43B transcripts (2026-07-24)
+
+Direct test of the Stage 2.5 asymmetry requirement (the critic must be
+STRONGER than the generator), run on the EXISTING `critic_data.jsonl`
+(0.43B generator transcripts: 60 correct / 1,455 confab, tracked 5 forced
+into test — identical split + protocol to Stage 2.5, seed 0). Critic-A
+features only (`--skip-b`), fresh out-dirs — the feature cache is keyed by
+critic name, not repo, so re-running into `stage2p5_results/` would have
+silently replayed the old 0.5B features.
+
+Runs (desktop RTX 2080 Ti 11GB, ~2 min extraction each after download):
+
+    train_critic.py --critic-a-repo Qwen/Qwen2.5-1.5B --skip-b \
+        --out-dir stage2p5_asym15_results                      # fp32
+    train_critic.py --critic-a-repo Qwen/Qwen2.5-3B  --skip-b \
+        --out-dir stage2p5_asym3_results --dtype float16       # ~12.4GB fp32
+                                                               # > 11GB VRAM
+
+(The 3B run needed the new `--dtype` flag; `load_family` gained a `dtype=`
+kwarg, default fp32 unchanged. Caveat: the 3B features come from an fp16
+forward — slightly below the fp32 probing convention; AUROC trend is
+unlikely to flip on that.)
+
+**Results (test n=307, tracked 5 forced in):**
+
+| critic | asymmetry vs 0.43B gen | best layer | AUROC | det@1% | det@5% | det@10% | det@25% |
+|---|---|---|---|---|---|---|---|
+| A Qwen2.5-0.5B (Stage 2.5) | ~1×  | 18 | 0.758 | 0.083 | 0.417 | 0.583 | 0.583 |
+| B RWKV late      (Stage 2.5) | self | 12 | 0.795 | 0.000 | 0.250 | 0.583 | 0.750 |
+| A Qwen2.5-1.5B   (this run)  | 3.5× | 14 | 0.826 | 0.167 | 0.583 | 0.667 | 0.833 |
+| A Qwen2.5-3B     (this run)  | 7×   | 35 | 0.845 | 0.083 | 0.583 | 0.583 | 0.833 |
+
+Deployed-threshold (train 5%-FPR) outcome at both new scales: detection
+0.993–1.000, false-flag 0.917, tracked 5/5 — **FAIL vs the pre-registered
+bar**, same shape as Stage 2.5. The threshold instability is unchanged
+because the correct class is unchanged (60 samples from the 0.43B).
+
+Median P(correct) per class:
+
+| class | 0.5B critic | 1.5B critic | 3B critic |
+|---|---|---|---|
+| corrects | 0.086 | 0.122 | **0.044** |
+| confabs  | 0.003 | 0.002 | 0.001 |
+| tracked5 | 0.005 | 0.005 | 0.000 |
+
+Tracked-5 scores at 3B: `[0.000, 0.000, 0.000, 0.008, 0.001]` — the Stage 2
+blind-spot samples are now maximally visible (effectively zero confidence).
+
+Bottom-k purity (both new scales): the bottom 5/10/25% of test scores are
+100% confabulation (base rate 96.1%) — the perfectly pure tail now covers a
+quarter of the test set.
+
+**Findings.**
+
+1. **Asymmetry requirement confirmed as a dose-response.** AUROC rises
+   monotonically with the critic:generator scale ratio: 0.758 (~1×) →
+   0.826 (3.5×) → 0.845 (7×). The amendment Stage 2.5 derived from a
+   failure is now a measured trend.
+2. **The bar still fails — and the bottleneck is provably the generator's
+   correct class, not the critic.** Tripling critic scale bought +0.09
+   AUROC but no operating point: 60 heterogeneous corrects are too few to
+   threshold against. Stage 2.5 finding 5, confirmed from the other side.
+   Only a generator whose correct class is populated (the 1.5B harvest)
+   can fix this.
+3. **Over-strictness at extreme asymmetry.** The 3B critic's median
+   P(correct) on genuinely-correct answers DROPS to 0.044 (vs 0.122 at
+   1.5B): a much stronger critic finds even the weak generator's *correct*
+   answers abnormal. The asymmetry requirement has a ceiling — the critic
+   must be stronger than the generator, but the generator must be strong
+   enough that its correct answers look normal to the critic. Both tails
+   of the ratio fail: equal-scale shares ignorance; extreme-scale
+   distrusts everything.
+4. **The blind spot is dead at 7× asymmetry.** Tracked confabulations
+   score 0.000–0.008. The detection principle is fully confirmed; the
+   deployment point still awaits a populated correct class.
+
+**Decision: asymmetry hypothesis CONFIRMED (measured dose-response);
+operating point still generator-limited, as predicted.** Next: the
+RWKV7-1.5B critic harvest (HANDOFF §6 action 3) — the same scripts rerun
+on 1.5B transcripts where the correct class should be far larger, then the
+asymmetric critic re-run on THAT data is the real deployment test.
+
+**Artifacts.** `stage2p5_asym15_results/`, `stage2p5_asym3_results/`
+(features npz, critic pkl, critic_report.json each), `analyze_critic_any.py`
+(parameterized operating-curve readout for any run folder), `--dtype` flag
+in `train_critic.py` + `dtype=` kwarg in `extract_states.load_family`.

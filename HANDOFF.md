@@ -3,18 +3,26 @@
 Read this first in a fresh chat. Everything you need to continue without the
 previous 500k-token conversation.
 
-> **LIVE STATE (2026-07-24 02:15):** Stage 3 COMPLETE — RWKV7-Goose-1.5B
-> fine-tuned + measured (RESULTS.md Stage 3 section): grammar 100%,
-> decide 100% (was 97.7%), boundary head AUROC 1.000 at all probed layers,
-> say/sense agreement 100%. Fine-tune took ~15 min on a 3090 (fla triton
-> kernels vs 6 h pure-python rwkv-4). Stack notes: fla 0.5.1 + pinned
-> transformers 4.56.2 (v5 incompatible), bf16, fused CE off, 16/24 layers
-> frozen. Artifacts in `heartly-rnn/stage3_results/` (model 3GB bf16,
-> probe head, say/sense report, logs). vast.ai instance 45634549:
-> DESTROYED (user-confirmed 2026-07-24). NEXT: critic harvest on the 1.5B
-> (gen_critic_data.py → content accuracy at scale, the 4.1% question —
-> needs a Linux GPU: fla/triton don't run on Windows), then asymmetric
-> critic (Qwen2.5-1.5B/3B on those transcripts — desktop GPU fine).
+> **LIVE STATE (2026-07-24 10:20):** Stage 2.6 COMPLETE — asymmetric
+> critic dose-response on the OLD 0.43B transcripts (RESULTS.md Stage
+> 2.6): AUROC 0.758 (Qwen2.5-0.5B) → 0.826 (1.5B) → 0.845 (3B) as the
+> critic:generator ratio goes ~1×→3.5×→7× — the Stage 2.5 asymmetry
+> requirement CONFIRMED as a measured trend. Pass bar still fails (58%
+> detection @ 5% FPR): the bottleneck is the generator's 60-sample
+> correct class, not the critic. New finding: over-strictness at 7× —
+> the 3B rates even CORRECT 0.43B answers at median P 0.044, so
+> asymmetry has a ceiling. Tracked 5 score 0.000–0.008 at 3B (blind spot
+> maximally visible). New tooling: `train_critic.py --dtype` (fp16 for
+> big critics), `analyze_critic_any.py` (any-folder operating curve),
+> `stage2p5_asym{15,3}_results/` (desktop RTX 2080 Ti ran it all, $0).
+> Stage 3 (RWKV7-1.5B fine-tune) COMPLETE + published on HF
+> (eivintobias/heartly-rwkv7-1.5b): grammar 100%, decide 100%, boundary
+> head AUROC 1.000 at all probed layers. vast.ai instance 45634549:
+> DESTROYED (user-confirmed 2026-07-24). NEXT: critic harvest on the
+> 1.5B (gen_critic_data.py — PATCH FIRST: no --tokenizer-repo flag yet,
+> and it loads fp32 which fla refuses → add bf16; Linux GPU only,
+> fla/triton don't run on Windows), then the asymmetric critic re-run on
+> the NEW transcripts (the real deployment test).
 
 ---
 
@@ -206,16 +214,24 @@ HF: huggingface.co/eivintobias/heartly-v2.
 2. ~~Scale generator to RWKV7-Goose-1.5B~~ DONE (2026-07-23): grammar 100%,
    decide 100%, head AUROC 1.000 all layers, ~$2, ~15 min train. Instance
    45634549 destroyed 2026-07-24. See RESULTS.md Stage 3.
-3. **Critic harvest on the 1.5B** (NEXT): gen_critic_data.py
-   --model heartly-rnn/stage3_results/rwkv7-heartly
-   --tokenizer-repo RWKV/RWKV7-Goose-World3-1.5B-HF over 2,902 questions →
-   content accuracy at 1.5B (the 4.1%-at-0.43B question). NEEDS Linux GPU
-   (fla/triton; desktop Windows can't load the model) → fresh vast.ai
-   instance, bf16, ~2–4h. Then train_critic.py on the harvest.
-4. **Asymmetric critic** (cheap, local, EXISTING critic_data.jsonl):
-   train_critic.py --critic-a-repo Qwen/Qwen2.5-1.5B --skip-b — direct test
-   of the asymmetry requirement on the OLD 0.43B transcripts. Desktop GPU
-   (fp16), no fla needed (plain Qwen). Can run any time, independent of 3.
+3. **Critic harvest on the 1.5B** (NEXT): gen_critic_data.py over the 2,902
+   questions with the Stage-3 model → content accuracy at 1.5B (the
+   4.1%-at-0.43B question). NEEDS Linux GPU (fla/triton; desktop Windows
+   can't load the model) → fresh vast.ai instance, ~2–4h. PATCHES NEEDED
+   FIRST (found 2026-07-24): the script has NO --tokenizer-repo flag yet
+   (the fine-tuned dir's saved tokenizer is broken — load from
+   RWKV/RWKV7-Goose-World3-1.5B-HF) and it loads fp32, which the fla
+   kernels refuse → switch to bf16. Model: pull
+   eivintobias/heartly-rwkv7-1.5b from HF on the instance (complete:
+   modeling file + tokenizer). While there: also dump critic-B features
+   (rwkv7 answer-end states) — can't be done on Windows. Then
+   train_critic.py on the harvest (asymmetric A = Qwen2.5-1.5B/3B — the
+   real deployment test now that Stage 2.6 confirmed the dose-response).
+4. ~~**Asymmetric critic** (cheap, local, EXISTING critic_data.jsonl)~~
+   DONE (2026-07-24, Stage 2.6): Qwen2.5-1.5B + 3B on the OLD 0.43B
+   transcripts. Dose-response confirmed (0.758→0.826→0.845 AUROC); bar
+   still fails on the starved correct class; over-strictness ceiling at
+   7× found. See RESULTS.md Stage 2.6.
 5. **Stage 4 — memory/state persistence**: save/load RWKV7 recurrent state
    across sessions ("waking with yesterday's gist"); then write-gate.
 6. **Qwen v4 run** (Track 1, parked): the `Heartly_V4/` notebook plan —

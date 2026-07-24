@@ -36,7 +36,8 @@ def quartile_idx(n):
     return idx
 
 
-def load_family(family, repo, device, trust_remote_code, tokenizer_repo=None):
+def load_family(family, repo, device, trust_remote_code, tokenizer_repo=None,
+                dtype=None):
     from transformers import AutoTokenizer, AutoModelForCausalLM
     try:
         tok = AutoTokenizer.from_pretrained(tokenizer_repo or repo,
@@ -52,8 +53,8 @@ def load_family(family, repo, device, trust_remote_code, tokenizer_repo=None):
             raise
     model = AutoModelForCausalLM.from_pretrained(
         repo,
-        torch_dtype=torch.float32,          # probing: precision over speed
-        trust_remote_code=trust_remote_code,
+        torch_dtype=dtype or torch.float32,  # probing: precision over speed
+        trust_remote_code=trust_remote_code,  # (dtype override: big-model VRAM)
     )
     model.to(device).eval()
     if tok.pad_token is None and tok.eos_token is not None:
