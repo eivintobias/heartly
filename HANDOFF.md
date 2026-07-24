@@ -48,7 +48,8 @@ ignorance**, compiled into the data itself. Output grammar:
 <think> [reasoning] </think> <decide> speak|stop </decide> <verify> known|unknown </verify> [answer] <stop>
 ```
 
-Owner: Eivin (independent researcher). Repo: github.com/eivintobias/heartly-v2.
+Owner: Eivin (independent researcher). Repo: github.com/eivintobias/heartly
+(renamed from heartly-v2 on 2026-07-24 — old URL redirects).
 HF: huggingface.co/eivintobias/heartly-v2.
 
 ## 2. What's done (chronological)

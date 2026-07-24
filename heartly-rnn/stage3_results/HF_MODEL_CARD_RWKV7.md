@@ -30,7 +30,7 @@ This model is the **Stage 3** artifact of the Heartly Track 2 program: an **RWKV
 | Boundary head AUROC (layers 6 / 12 / 18 / 23) | **1.000 / 1.000 / 1.000 / 1.000** |
 | Say/sense agreement | 100% |
 
-Full experiment record: [heartly-rnn/RESULTS.md on GitHub](https://github.com/eivintobias/heartly-v2/blob/main/heartly-rnn/RESULTS.md) (Stages 1–3).
+Full experiment record: [heartly-rnn/RESULTS.md on GitHub](https://github.com/eivintobias/heartly/blob/main/heartly-rnn/RESULTS.md) (Stages 1–3).
 
 ---
 
@@ -101,7 +101,7 @@ Known limitation (documented in Stage 2/2.5 of the research record): the head sh
 
 ## Links
 
-- **GitHub (code + full results + papers):** https://github.com/eivintobias/heartly-v2
+- **GitHub (code + full results + papers):** https://github.com/eivintobias/heartly
 - **Experiment record:** `heartly-rnn/RESULTS.md` (Stage 3 section)
 - **Program paper:** `research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md`
 - **Related:** [`eivintobias/heartly-v2`](https://huggingface.co/eivintobias/heartly-v2) (Qwen2.5-0.5B GGUF, Track 1)
