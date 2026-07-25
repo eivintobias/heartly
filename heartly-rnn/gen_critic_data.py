@@ -42,10 +42,11 @@ VERIFY_RE = re.compile(r"<verify>\s*(known|unknown)\s*</verify>")
 STOP_SEQ = [61, 27081, 63]  # "<stop>" in the RWKV world vocab
 
 
-def load_model(path):
+def load_model(path, tokenizer_repo=None, dtype=torch.float32):
     from transformers import AutoModelForCausalLM, AutoTokenizer
-    tok = AutoTokenizer.from_pretrained(path, trust_remote_code=True)
-    model = AutoModelForCausalLM.from_pretrained(path, dtype=torch.float32,
+    tok = AutoTokenizer.from_pretrained(tokenizer_repo or path,
+                                        trust_remote_code=True)
+    model = AutoModelForCausalLM.from_pretrained(path, dtype=dtype,
                                                  trust_remote_code=True)
     model.eval()
     dev = "cuda" if torch.cuda.is_available() else "cpu"
@@ -122,11 +123,19 @@ def main():
     ap.add_argument("--out", default="critic_data.jsonl")
     ap.add_argument("--max-new", type=int, default=120)
     ap.add_argument("--limit", type=int, default=0, help="debug: first N questions")
+    ap.add_argument("--tokenizer-repo", default=None,
+                    help="load tokenizer from a different repo/dir (e.g. the "
+                         "base RWKV repo) — the fine-tuned dir's saved "
+                         "tokenizer is broken")
+    ap.add_argument("--dtype", default="float32",
+                    choices=["float32", "float16", "bfloat16"],
+                    help="model load dtype — fla/RWKV7 kernels require bfloat16")
     args = ap.parse_args()
 
     stoppers = StoppingCriteriaList([StopAtSeq(STOP_SEQ)])
 
-    tok, model = load_model(args.model)
+    tok, model = load_model(args.model, args.tokenizer_repo,
+                            getattr(torch, args.dtype))
 
     rows = [json.loads(l) for l in open(args.questions, encoding="utf-8")]
     rows.sort(key=lambda r: r["id"])

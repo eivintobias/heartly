@@ -70,7 +70,8 @@ def forward_features(family, model, enc, layer_idx):
     hidden = None
     hs = getattr(out, "hidden_states", None)
     if hs is not None:
-        sel = [hs[i][0, -1, :].detach().cpu().numpy().astype(np.float16) for i in layer_idx]
+        # .float() before numpy: bf16 tensors (fla RWKV7) are numpy-unsupported
+        sel = [hs[i][0, -1, :].detach().float().cpu().numpy().astype(np.float16) for i in layer_idx]
         hidden = np.stack(sel)
 
     # Recurrent state, auto-detected:
@@ -110,7 +111,7 @@ def forward_features(family, model, enc, layer_idx):
         cand = getattr(cache, "ssm_states", None) if cache is not None else None
         st = getattr(out, "state", None)
         if cand is not None:
-            sel = [cand[i].detach().cpu().reshape(-1).numpy().astype(np.float16)
+            sel = [cand[i].detach().float().cpu().reshape(-1).numpy().astype(np.float16)
                    for i in layer_idx if i < len(cand)]
             if sel:
                 rstate = np.stack(sel)
@@ -122,10 +123,10 @@ def forward_features(family, model, enc, layer_idx):
                 for i in layer_idx:
                     if i >= st[0].shape[-1]:
                         continue
-                    vec = torch.cat([s[0, :, i].detach().cpu() for s in st])
+                    vec = torch.cat([s[0, :, i].detach().float().cpu() for s in st])
                     sel.append(vec.numpy().astype(np.float16))
             else:
-                sel = [st[i].detach().cpu().reshape(-1).numpy().astype(np.float16)
+                sel = [st[i].detach().float().cpu().reshape(-1).numpy().astype(np.float16)
                        for i in layer_idx if i < len(st)]
             if sel:
                 rstate = np.stack(sel)

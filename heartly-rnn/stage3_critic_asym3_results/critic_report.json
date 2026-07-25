@@ -1,0 +1,77 @@
+{
+  "data": "heartly-rnn\\critic_data_rwkv7_final.jsonl",
+  "n_labeled": 1480,
+  "n_train": 1179,
+  "n_test": 301,
+  "pass_bar": "detection >= 0.70 & false_flag <= 0.05 & tracked >= 4/5",
+  "critics": [
+    {
+      "name": "A_qwen_transcript",
+      "best_layer_slot": 3,
+      "auroc": 0.8241261722080135,
+      "threshold": 0.5117000637501811,
+      "detection": 0.9490196078431372,
+      "false_flag": 0.6956521739130435,
+      "n_test": 301,
+      "n_confab": 255,
+      "n_correct": 46,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "question": "Who, in 1936, painted a portrait of Mae West in which her face is also a furnish",
+          "p_correct": 7.166185581979683e-05,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "question": "When is the Members Debate held?",
+          "p_correct": 0.010365402537784889,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "question": "What Aaron Sorkin created show did ABC debut in 1998?",
+          "p_correct": 0.02001044974718002,
+          "flagged": true
+        },
+        {
+          "id": 5,
+          "question": "What was the goal of this Roman disobedience?",
+          "p_correct": 0.004845982754017926,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "question": "Which drink is advertised as ‘charcoal mellowed, drop by drop’?",
+          "p_correct": 0.0006934960050323958,
+          "flagged": true
+        }
+      ],
+      "per_generator": {
+        "squad": {
+          "conf_n": 130,
+          "conf_caught": 123,
+          "corr_n": 24,
+          "corr_flagged": 17
+        },
+        "trivia_qa": {
+          "conf_n": 125,
+          "conf_caught": 119,
+          "corr_n": 22,
+          "corr_flagged": 15
+        }
+      },
+      "layers_probed": [
+        0,
+        9,
+        18,
+        27,
+        35
+      ],
+      "probed_layer": 27,
+      "pass": false
+    }
+  ]
+}

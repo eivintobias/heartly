@@ -3,26 +3,27 @@
 Read this first in a fresh chat. Everything you need to continue without the
 previous 500k-token conversation.
 
-> **LIVE STATE (2026-07-24 10:20):** Stage 2.6 COMPLETE — asymmetric
-> critic dose-response on the OLD 0.43B transcripts (RESULTS.md Stage
-> 2.6): AUROC 0.758 (Qwen2.5-0.5B) → 0.826 (1.5B) → 0.845 (3B) as the
-> critic:generator ratio goes ~1×→3.5×→7× — the Stage 2.5 asymmetry
-> requirement CONFIRMED as a measured trend. Pass bar still fails (58%
-> detection @ 5% FPR): the bottleneck is the generator's 60-sample
-> correct class, not the critic. New finding: over-strictness at 7× —
-> the 3B rates even CORRECT 0.43B answers at median P 0.044, so
-> asymmetry has a ceiling. Tracked 5 score 0.000–0.008 at 3B (blind spot
-> maximally visible). New tooling: `train_critic.py --dtype` (fp16 for
-> big critics), `analyze_critic_any.py` (any-folder operating curve),
-> `stage2p5_asym{15,3}_results/` (desktop RTX 2080 Ti ran it all, $0).
-> Stage 3 (RWKV7-1.5B fine-tune) COMPLETE + published on HF
-> (eivintobias/heartly-rwkv7-1.5b): grammar 100%, decide 100%, boundary
-> head AUROC 1.000 at all probed layers. vast.ai instance 45634549:
-> DESTROYED (user-confirmed 2026-07-24). NEXT: critic harvest on the
-> 1.5B (gen_critic_data.py — PATCH FIRST: no --tokenizer-repo flag yet,
-> and it loads fp32 which fla refuses → add bf16; Linux GPU only,
-> fla/triton don't run on Windows), then the asymmetric critic re-run on
-> the NEW transcripts (the real deployment test).
+> **LIVE STATE (2026-07-25 05:00):** Stage 3.5 COMPLETE — the real
+> deployment test is DONE (RESULTS.md Stage 3.5). Critic harvest on the
+> 1.5B: 2,902/2,902 rows, 0 unparsed; content accuracy **15.5%** (was
+> 4.1% at 0.43B); decide **99.8%**, ZERO confab_unknown; the 5 Stage-2
+> blind-spot questions are ALL abstains at 1.5B. Critics on the new
+> transcripts (new pre-registered tracked 5 via `pick_tracked.py`):
+> B RWKV7-late **0.835** > Qwen2.5-3B 0.824 > Qwen2.5-1.5B 0.750 —
+> asymmetry dose-response AND B>A both replicate at the new scale. Bar
+> still fails everywhere: the populated correct class did NOT rescue the
+> operating point (Stage 2.6's prediction dead as a sufficient
+> condition — the bottleneck is the correct-answer score DISTRIBUTION,
+> not class size). Better generator = subtler confabs (same-critic
+> AUROCs dropped vs the old data). Pure tail huge: bottom 10% of B's
+> scores 100% confab. New tooling: `pick_tracked.py` (deterministic
+> post-harvest tracked-set registration), `gen_critic_data.py
+> --tokenizer-repo/--dtype`, `extract_states.py` bf16-numpy fix.
+> vast.ai instance 45730818 (~7.2h GPU, ~$2.50): all artifacts verified
+> local — DESTROY. NEXT: Stage 4 (memory/state persistence), or the
+> critic directions from the Stage 3.5 decision (fitted critic on the
+> generator's own distribution / content-verifying critics /
+> ranking-as-product).
 
 ---
 
@@ -194,6 +195,14 @@ HF: huggingface.co/eivintobias/heartly-v2.
   world vocab as rwkv-4 (rwkv_vocab_v20230424.txt) → `<stop>` ids and
   string-offset tricks carry over. Config: 24 layers, hidden 2048, vocab
   65536, tie_word_embeddings=false.
+- **numpy can't read bf16 tensors** (`TypeError: Got unsupported
+  ScalarType BFloat16`): `extract_states.forward_features` now casts
+  `.float()` before `.cpu().numpy()` at every extraction site (2026-07-25;
+  latent bug while all loads were fp32 — fired the moment critic-B ran on
+  the bf16 RWKV7).
+- **scp of >~100MB files stalls at 0 bytes through the vast.ai proxy.**
+  Proven fix (182MB features npz, 2026-07-25): `split -b 60M` on the
+  instance, scp per-chunk, `copy /b` reassembly locally, verify byte count.
 - **vast.ai SSH (SOLVED 2026-07-23):** past failures = the private key only
   existed on the laptop. Desktop now has its own ed25519 key
   (`C:\Users\eivin\.ssh\id_ed25519`, "heartly-vast-desktop") on the account.
@@ -215,19 +224,15 @@ HF: huggingface.co/eivintobias/heartly-v2.
 2. ~~Scale generator to RWKV7-Goose-1.5B~~ DONE (2026-07-23): grammar 100%,
    decide 100%, head AUROC 1.000 all layers, ~$2, ~15 min train. Instance
    45634549 destroyed 2026-07-24. See RESULTS.md Stage 3.
-3. **Critic harvest on the 1.5B** (NEXT): gen_critic_data.py over the 2,902
-   questions with the Stage-3 model → content accuracy at 1.5B (the
-   4.1%-at-0.43B question). NEEDS Linux GPU (fla/triton; desktop Windows
-   can't load the model) → fresh vast.ai instance, ~2–4h. PATCHES NEEDED
-   FIRST (found 2026-07-24): the script has NO --tokenizer-repo flag yet
-   (the fine-tuned dir's saved tokenizer is broken — load from
-   RWKV/RWKV7-Goose-World3-1.5B-HF) and it loads fp32, which the fla
-   kernels refuse → switch to bf16. Model: pull
-   eivintobias/heartly-rwkv7-1.5b from HF on the instance (complete:
-   modeling file + tokenizer). While there: also dump critic-B features
-   (rwkv7 answer-end states) — can't be done on Windows. Then
-   train_critic.py on the harvest (asymmetric A = Qwen2.5-1.5B/3B — the
-   real deployment test now that Stage 2.6 confirmed the dose-response).
+3. ~~**Critic harvest on the 1.5B + asymmetric critic re-run**~~ DONE
+   (2026-07-25, Stage 3.5): content accuracy 15.5% at 1.5B; decide 99.8%,
+   0 confab_unknown; legacy blind-spot 5 all abstain. Critics: B 0.835 >
+   3B 0.824 > 1.5B 0.750 — dose-response + B>A replicate; bar fails
+   everywhere; correct-class hypothesis dead. New tracked-5 pre-registered
+   via `pick_tracked.py`. See RESULTS.md Stage 3.5. Critic directions
+   now open: (a) fitted critic on the generator's own correct/confab
+   distribution, (b) content-verifying critics (retrieval,
+   self-consistency), (c) ranking-as-product (bottom-k review queue).
 4. ~~**Asymmetric critic** (cheap, local, EXISTING critic_data.jsonl)~~
    DONE (2026-07-24, Stage 2.6): Qwen2.5-1.5B + 3B on the OLD 0.43B
    transcripts. Dose-response confirmed (0.758→0.826→0.845 AUROC); bar
@@ -239,7 +244,11 @@ HF: huggingface.co/eivintobias/heartly-v2.
    kind-aware rendering + true-boundary mix on Qwen2.5-0.5B. Superseded-ish by
    Track 2 wins, but needed for the paper's Track-1 line.
 7. ~~Paper update~~ DONE (2026-07-22): §7A complete incl. Stage 2.5 verdict;
-   §5.4 critic un-shelved. NEXT paper edit: add Stage 3 (§7B?) after harvest.
+   §5.4 critic un-shelved. NEXT paper edit: add Stage 3 (recipe scales to
+   1.5B: grammar/decide/sense at ceiling) AND Stage 3.5 (the real
+   deployment test: ranking works, thresholding doesn't, correct-class
+   hypothesis dead, B>A + dose-response replicate) — plus the plain copy
+   in `research_papers/plain/` per §0.
 
 ## 7. START PROMPT for the new chat (paste this)
 
@@ -247,10 +256,14 @@ HF: huggingface.co/eivintobias/heartly-v2.
 > grammar + boundary-head absence sensors on RNN states). Start by reading
 > HANDOFF.md in the workspace root — it has the full project state, file map,
 > environment gotchas, and next actions. Then read heartly-rnn/RESULTS.md —
-> the record now includes Stage 3: RWKV7-Goose-1.5B fine-tuned (grammar 100%,
-> decide 100%, boundary head AUROC 1.000 at all probed layers), on top of
-> Stage 2.5's asymmetry requirement (critic must be STRONGER than the
-> generator). Next up per HANDOFF §6: critic harvest on the 1.5B (content
-> accuracy at scale — needs a Linux GPU box, fla/triton don't run on
-> Windows), then the asymmetric critic test (desktop GPU OK). Read files
-> before proposing anything.
+> the record now runs through Stage 3.5: RWKV7-Goose-1.5B fine-tuned
+> (grammar 100%, decide 100%, boundary head AUROC 1.000 at all probed
+> layers) PLUS the real deployment test on it (critic harvest: 15.5%
+> content accuracy, decide 99.8%, 0 confab_unknown; critics B 0.835 >
+> 3B 0.824 > 1.5B 0.750 — the asymmetry dose-response and B>A ordering
+> both replicate, the operating point still fails, and the
+> "populate the correct class" hypothesis is dead). Next up per HANDOFF
+> §6: Stage 4 (memory/state persistence), or one of the open critic
+> directions (fitted critic on the generator's own distribution /
+> content-verifying critic / ranking-as-product). Read files before
+> proposing anything.

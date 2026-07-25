@@ -484,3 +484,115 @@ asymmetric critic re-run on THAT data is the real deployment test.
 (features npz, critic pkl, critic_report.json each), `analyze_critic_any.py`
 (parameterized operating-curve readout for any run folder), `--dtype` flag
 in `train_critic.py` + `dtype=` kwarg in `extract_states.load_family`.
+
+---
+# Stage 3.5 — critic harvest at 1.5B + the real deployment test (2026-07-25)
+
+The Stage-2.5/2.6 pipeline rerun end-to-end on the Stage-3 generator
+(`eivintobias/heartly-rwkv7-1.5b`). vast.ai instance 45730818 (RTX 3090,
+PyTorch CUDA-12 template, transformers 4.56.2 + fla 0.5.1 + triton 3.7.0).
+`gen_critic_data.py` gained `--tokenizer-repo` (the fine-tuned dir's saved
+tokenizer is broken — load from `RWKV/RWKV7-Goose-World3-1.5B-HF`) and
+`--dtype bfloat16` (fla kernels refuse fp32); `extract_states.py` gained
+`.float()` casts before numpy (bf16 tensors are numpy-unsupported — latent
+bug that never fired while all loads were fp32). Single-prompt greedy,
+max-new 120, early stop at `<stop>` — identical protocol to Stage 2.5.
+
+**Harvest (6h57m, ~8.6 s/question).** 2,902/2,902 rows, **0 unparsed**
+(grammar 100% at scale). Row classes:
+
+| row_class | n | note |
+|---|---|---|
+| abstain | 1,422 | all 1,416 unknown-class + 6 known-side over-refusals |
+| correct | 229 | was 60 at 0.43B |
+| confab_content | 1,251 | spoke, wrong content |
+| confab_unknown | **0** | was 56 at 0.43B — perfect unknown-side refusal |
+
+- **Content accuracy on spoken knowns: 229/1,480 = 15.5%** (was 60/1,459 =
+  4.1% at 0.43B — 3.8× better, still low: capability scales, slowly).
+- **Decide accuracy: 2,896/2,902 = 99.8%** (0 confab_unknown, 6 over-refusals).
+- **Legacy tracked-5 (the Stage-2 blind spot): ALL ABSTAIN.** Every question
+  that fooled the 0.43B is refused by the 1.5B.
+
+**Pre-registration (new tool).** `pick_tracked.py` — a deterministic,
+documented selection rule run after the harvest and BEFORE any critic
+training, replacing the Stage-2-specific ad-hoc tracked set. Rule: (1)
+legacy ids still confabulating (none — all abstain), (2) confab_unknown
+ascending id (none exist at 1.5B), (3) confab_content ascending id →
+**new must-catch 5 = ids 0, 2, 3, 5, 7**. Same bar (detection ≥70% @ ≤5%
+FPR AND ≥4/5 tracked), same split protocol + seed 0 as 2.5/2.6
+(test n=301, tracked forced in). Registration record:
+`pick_tracked_rwkv7.log`.
+
+**Critics (test n=301):**
+
+| critic | asymmetry | best layer | AUROC | det@1% | det@5% | det@10% | det@25% | deployed det | deployed FPR | tracked |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A Qwen2.5-1.5B | 1× | 14 | 0.750 | 0.087 | 0.283 | 0.435 | 0.522 | 0.890 | 0.565 | 5/5 FAIL |
+| A Qwen2.5-3B | 2× | 27 | 0.824 | 0.065 | 0.304 | 0.391 | 0.783 | 0.949 | 0.696 | 5/5 FAIL |
+| B RWKV7 late | self | 12 | 0.835 | 0.152 | 0.543 | 0.630 | 0.696 | 0.992 | 0.870 | 5/5 FAIL |
+
+Median P(correct) per class:
+
+| class | 1.5B critic | 3B critic | B RWKV7 |
+|---|---|---|---|
+| corrects | 0.179 | 0.218 | **0.403** |
+| confabs | 0.019 | 0.008 | 0.001 |
+| tracked5 | 0.011 | 0.005 | **0.000** |
+
+Bottom-k purity: bottom 5% of scores is 93%/100%/100% confab (1.5B/3B/B);
+bottom 10% of B's scores 100% confab (n≈30, base rate 84.7%).
+
+**Findings.**
+
+1. **The asymmetry dose-response replicates on the new generator.** AUROC
+   rises with critic scale: 0.750 (1×) → 0.824 (2×). Same shape as Stage
+   2.6's 0.758 → 0.826 → 0.845 (~1× → 3.5× → 7×) on the old transcripts.
+2. **B > A replicates at the new scale — position still beats
+   independence.** The same-model late critic (0.835) edges a 2×-larger
+   independent critic (0.824), and is the LEAST over-strict by far
+   (corrects median 0.403 vs 0.179–0.218).
+3. **The populated correct class did NOT rescue the operating point — the
+   Stage 2.6 prediction is falsified as a sufficient condition.** 229
+   corrects (3.8× the old 60) and the deployed 5%-FPR threshold still
+   false-flags 57–87% of correct answers. The bottleneck is the
+   correct-answer score DISTRIBUTION (median P(correct) on genuinely
+   correct answers 0.179–0.403 — the generator's own correct answers
+   don't look normal to the critic), not the class size.
+4. **Better generators make harder confabs.** Same-critic AUROCs sit
+   BELOW their Stage 2.6 numbers on the old data (1.5B: 0.750 vs 0.826;
+   3B: 0.824 vs 0.845). The 1.5B's confabulations are subtler than the
+   0.43B's — the critic's job gets harder as the generator improves.
+5. **Ranking works at scale; thresholding still doesn't — but the pure
+   tail is now huge.** Bottom 10% of B's scores = 100% confabulation.
+   The new tracked 5 score 0.000–0.064 on all critics. The detection
+   principle is confirmed at 1.5B; the deployment point remains elusive
+   everywhere tested.
+6. **Legacy blind spot: behaving at 1.5B.** The 5 Stage-2 confabulation
+   questions are all abstains — decide-side the blind spot is closed at
+   this scale. What remains open is content-side: the model still
+   confabulates on 84.5% of what it chooses to answer.
+
+**Decision: the real deployment test says the critic ALARM ranks
+confidently but cannot threshold — at any tested scale, asymmetry, or
+correct-class size. The asymmetry requirement, B>A ordering, and
+dose-response all replicate; "populate the correct class and the
+threshold will appear" is dead. Next candidates: (a) train the critic ON
+the generator's own correct/confab distribution (a fitted head, not a
+generic probe); (b) content-verifying critics (retrieval,
+self-consistency) instead of signature critics; (c) ship ranking as the
+product (bottom-k review queue) since thresholding stays elusive. The
+decide-side, meanwhile, is at ceiling at 1.5B (99.8% decide, 0
+confab_unknown) — the open problem is content, exactly as the capability
+caveat predicted. Stage 4 (memory/state persistence) unaffected.**
+
+**Artifacts.** `critic_data_rwkv7.jsonl` (2,902 raw rows),
+`critic_data_rwkv7_final.jsonl` (tracked-marked, the critic input),
+`pick_tracked.py` + `pick_tracked_rwkv7.log` (pre-registration),
+`harvest.log`, `stage3_critic_results/` (features_B_rwkv_late.npz 182MB,
+critic_B_rwkv_late.pkl, critic_report.json — B retrained locally with
+sklearn 1.7.2 from cached features; replicates the instance's 0.834
+exactly), `stage3_critic_asym15_results/`, `stage3_critic_asym3_results/`,
+`asym15.log`, `asym3.log`. Instance 45730818 ran the full pipeline
+2026-07-24→25 (~7.2h GPU, ~$2.50); all artifacts verified local
+2026-07-25 — instance safe to destroy.
