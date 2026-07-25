@@ -1,0 +1,89 @@
+{
+  "model": "eivintobias/heartly-rwkv7-1.5b",
+  "phases": {
+    "save": {
+      "path": "stage4_results/gist_state.pt",
+      "mb": 12.800309,
+      "n_layers": 24,
+      "layer0": {
+        "recurrent_state": [
+          1,
+          32,
+          64,
+          64
+        ],
+        "conv_state": [
+          1,
+          2048
+        ],
+        "ffn_state": [
+          1,
+          2048
+        ]
+      }
+    },
+    "mech": {
+      "cosine": 1.000007152557373,
+      "argmax_match": true,
+      "pass": true
+    },
+    "quiz": [
+      {
+        "key": "dog",
+        "question": "What is my dog's name?",
+        "gold": "zorblax",
+        "baseline_text": " I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know",
+        "baseline_hit": false,
+        "gist_text": " <stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop",
+        "gist_hit": false,
+        "gist_parsed": false
+      },
+      {
+        "key": "codename",
+        "question": "What is the secret project codename?",
+        "gold": "velvet aurora",
+        "baseline_text": " I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know",
+        "baseline_hit": false,
+        "gist_text": " <stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop",
+        "gist_hit": false,
+        "gist_parsed": false
+      },
+      {
+        "key": "number",
+        "question": "What is my favorite number?",
+        "gold": "7,423",
+        "baseline_text": " I have no information about this. I should say I don't know rather than guess. <think> I do not know. </think><decide>speak</decide><verify>unknown</verify> I don't have that information. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do",
+        "baseline_hit": false,
+        "gist_text": " <stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop",
+        "gist_hit": false,
+        "gist_parsed": false
+      },
+      {
+        "key": "collect",
+        "question": "What do I collect?",
+        "gold": "lighthouse",
+        "baseline_text": " I know this fact. I can answer confidently. I will speak. <think> I will speak. </think><decide>speak</decide><verify>known</verify> The answer is coins. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will",
+        "baseline_hit": false,
+        "gist_text": " <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop",
+        "gist_hit": false,
+        "gist_parsed": false
+      },
+      {
+        "key": "password",
+        "question": "What is the lab door password?",
+        "gold": "mango tuesday",
+        "baseline_text": " I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know",
+        "baseline_hit": false,
+        "gist_text": " <stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop",
+        "gist_hit": false,
+        "gist_parsed": false
+      }
+    ]
+  },
+  "summary": {
+    "baseline_hits": 0,
+    "gist_hits": 0,
+    "gist_parsed": 0,
+    "VERDICT": "FAIL"
+  }
+}

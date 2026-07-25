@@ -1,0 +1,40 @@
+/venv/main/lib/python3.12/site-packages/fla/layers/rwkv7.py:148: UserWarning: According to Bo, you are using a potentially buggy FLA implementation of RWKV. If you plan to report any numbers based on this implementation, we strongly recommend cross-checking with the official repo: https://github.com/BlinkDL/RWKV-LM. Bo may disagree with results reported from this version.
+  warnings.warn(
+
+== 1. LIVE-cache quiz (declarative teach, NO reload) ==
+-- What is my dog's name?
+   live: "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What is the secret project codename?
+   live: "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What is my favorite number?
+   live: "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What do I collect?
+   live: "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is the lab door password?
+   live: "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+LIVE declarative quiz: 0/5
+
+== 2. Primed content probe (answer slot forced open) ==
+-- dog: 'already known. There is nothing to respond to.stop</think> I do not have that information.' | hit False
+-- codename: "not something I know. </think> I do not have that information. <stop> I don't have that in" | hit False
+-- number: '7. <stop>done</stop> I will speak. <stop>known</stop>done</stop>done' | hit False
+-- collect: 'dinosaur bones. </think><decide>verify</verify>known</verify> The answer is dinosaur bones' | hit False
+-- password: 'mango Tuesday. </think> I will speak. <stop>done</stop> I will speak. <stop>' | hit True
+primed probe: 1/5
+
+== 3. QA-style teach (facts as Q/A pairs), then quiz ==
+-- What is my dog's name?
+   live: "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What is the secret project codename?
+   live: '<think>The user asks a factual question. I have this in my knowledge. I will speak. </think><decide>speak</decide> The answer is V' | hit True
+-- What is my favorite number?
+   live: "<think>The user asks a factual question.</think> I don't have that information. <stop> I do not know. <stop> I don't have that inf" | hit False
+-- What do I collect?
+   live: "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is the lab door password?
+   live: "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+QA-teach quiz: 1/5
+
+==== READ ====
+live-declarative 0/5 | primed 1/5 | QA-teach 1/5
+live==0 & primed==0 -> state content is shallow everywhere; live==0 & primed>0 -> disposition overrides content; QA>decl -> write format decides retrievability

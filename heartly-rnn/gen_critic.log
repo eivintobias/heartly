@@ -1,0 +1,10 @@
+model on cpu
+2902 questions | stage2 confab ids: [1331, 1460, 1616, 1670, 2797] | over-refusal ids: [1475, 1587]
+first 10: 97.4s (9.74s/q -> full run ~7.9h)
+
+critic_data.jsonl: 2902 rows (+2902 new, 38420s)
+  abstain         1387
+  confab_content  1399
+  confab_unknown  56
+  correct         60
+critic training pool: 60 correct / 1455 confabulations (56 unknown, 1399 content)
