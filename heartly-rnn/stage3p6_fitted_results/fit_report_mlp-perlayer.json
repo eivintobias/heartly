@@ -1,0 +1,62 @@
+{
+  "name": "mlp-perlayer",
+  "auroc": 0.814151747655584,
+  "det@1": 0.6274509803921569,
+  "fpr@1": 0.1956521739130435,
+  "det@5": 0.8980392156862745,
+  "fpr@5": 0.43478260869565216,
+  "threshold": 0.13993497788906098,
+  "detection": 0.8980392156862745,
+  "false_flag": 0.43478260869565216,
+  "tracked_n": 5,
+  "tracked_caught": 5,
+  "tracked_detail": [
+    {
+      "id": 0,
+      "p_correct": 2.0047055571126293e-08,
+      "flagged": true
+    },
+    {
+      "id": 2,
+      "p_correct": 4.892818469670601e-05,
+      "flagged": true
+    },
+    {
+      "id": 3,
+      "p_correct": 0.0010555016342550516,
+      "flagged": true
+    },
+    {
+      "id": 5,
+      "p_correct": 2.1498756268556463e-06,
+      "flagged": true
+    },
+    {
+      "id": 7,
+      "p_correct": 0.0002504889271222055,
+      "flagged": true
+    }
+  ],
+  "det@10": 0.9607843137254902,
+  "fpr@10": 0.8043478260869565,
+  "det@25": 0.9803921568627451,
+  "fpr@25": 0.8478260869565217,
+  "median_p_correct": {
+    "corrects": 0.2593992352485657,
+    "confabs": 0.0007031942950561643,
+    "tracked5": 4.892818469670601e-05
+  },
+  "bottom5_purity": 1.0,
+  "bottom10_purity": 0.9666666666666667,
+  "bottom25_purity": 0.96,
+  "base_rate_confab": 0.8471760797342193,
+  "pass": false,
+  "cv_auroc_per_layer": [
+    0.6014,
+    0.6845,
+    0.8125,
+    0.8205,
+    0.7802
+  ],
+  "cv_selected_layer_slot": 3
+}

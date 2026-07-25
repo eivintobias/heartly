@@ -1,0 +1,62 @@
+{
+  "name": "logreg-calibrated",
+  "auroc": 0.8281329923273657,
+  "det@1": 0.9803921568627451,
+  "fpr@1": 0.717391304347826,
+  "det@5": 0.984313725490196,
+  "fpr@5": 0.7391304347826086,
+  "threshold": 0.4893093985041337,
+  "detection": 0.984313725490196,
+  "false_flag": 0.7391304347826086,
+  "tracked_n": 5,
+  "tracked_caught": 5,
+  "tracked_detail": [
+    {
+      "id": 0,
+      "p_correct": 0.02415621778455463,
+      "flagged": true
+    },
+    {
+      "id": 2,
+      "p_correct": 0.05144301372909034,
+      "flagged": true
+    },
+    {
+      "id": 3,
+      "p_correct": 0.07281800305766446,
+      "flagged": true
+    },
+    {
+      "id": 5,
+      "p_correct": 0.031371515162280636,
+      "flagged": true
+    },
+    {
+      "id": 7,
+      "p_correct": 0.021358395524466646,
+      "flagged": true
+    }
+  ],
+  "det@10": 0.9882352941176471,
+  "fpr@10": 0.782608695652174,
+  "det@25": 0.9882352941176471,
+  "fpr@25": 0.8043478260869565,
+  "median_p_correct": {
+    "corrects": 0.35951434419770634,
+    "confabs": 0.07069744371906608,
+    "tracked5": 0.031371515162280636
+  },
+  "bottom5_purity": 0.8666666666666667,
+  "bottom10_purity": 0.9333333333333333,
+  "bottom25_purity": 0.9733333333333334,
+  "base_rate_confab": 0.8471760797342193,
+  "pass": false,
+  "cv_auroc_per_layer": [
+    0.615,
+    0.7387,
+    0.8487,
+    0.852,
+    0.8386
+  ],
+  "cv_selected_layer_slot": 3
+}

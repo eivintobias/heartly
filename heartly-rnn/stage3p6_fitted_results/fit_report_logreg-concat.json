@@ -1,0 +1,55 @@
+{
+  "name": "logreg-concat",
+  "auroc": 0.8390451832907075,
+  "det@1": 1.0,
+  "fpr@1": 0.9347826086956522,
+  "det@5": 1.0,
+  "fpr@5": 0.9347826086956522,
+  "threshold": 0.9859625409441581,
+  "detection": 1.0,
+  "false_flag": 0.9347826086956522,
+  "tracked_n": 5,
+  "tracked_caught": 5,
+  "tracked_detail": [
+    {
+      "id": 0,
+      "p_correct": 2.3372638669148023e-05,
+      "flagged": true
+    },
+    {
+      "id": 2,
+      "p_correct": 0.00024410380728119381,
+      "flagged": true
+    },
+    {
+      "id": 3,
+      "p_correct": 0.004570374597983591,
+      "flagged": true
+    },
+    {
+      "id": 5,
+      "p_correct": 6.676699112593666e-06,
+      "flagged": true
+    },
+    {
+      "id": 7,
+      "p_correct": 2.6405514837029713e-05,
+      "flagged": true
+    }
+  ],
+  "det@10": 1.0,
+  "fpr@10": 0.9347826086956522,
+  "det@25": 1.0,
+  "fpr@25": 0.9347826086956522,
+  "median_p_correct": {
+    "corrects": 0.2533445094958506,
+    "confabs": 0.0006221855833614044,
+    "tracked5": 2.6405514837029713e-05
+  },
+  "bottom5_purity": 1.0,
+  "bottom10_purity": 0.9666666666666667,
+  "bottom25_purity": 0.9866666666666667,
+  "base_rate_confab": 0.8471760797342193,
+  "pass": false,
+  "cv_auroc": 0.8575
+}

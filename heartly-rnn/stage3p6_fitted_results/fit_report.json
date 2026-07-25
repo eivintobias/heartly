@@ -1,0 +1,360 @@
+{
+  "data": "critic_data_rwkv7_final.jsonl",
+  "features": "stage3_critic_results\\features_B_rwkv_late.npz",
+  "pass_bar": "detection >= 0.70 & false_flag <= 0.05 & tracked >= 4/5",
+  "methods": [
+    {
+      "name": "logreg-perlayer",
+      "auroc": 0.8213981244671782,
+      "det@1": 0.9882352941176471,
+      "fpr@1": 0.7608695652173914,
+      "det@5": 0.9921568627450981,
+      "fpr@5": 0.7608695652173914,
+      "threshold": 0.9263227203576043,
+      "detection": 0.9921568627450981,
+      "false_flag": 0.7608695652173914,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "p_correct": 3.601870257305196e-05,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "p_correct": 0.00035541752316442217,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "p_correct": 0.0016316901796986298,
+          "flagged": true
+        },
+        {
+          "id": 5,
+          "p_correct": 7.634902918749636e-05,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "p_correct": 8.992178253090998e-06,
+          "flagged": true
+        }
+      ],
+      "det@10": 0.9921568627450981,
+      "fpr@10": 0.7608695652173914,
+      "det@25": 0.9921568627450981,
+      "fpr@25": 0.8260869565217391,
+      "median_p_correct": {
+        "corrects": 0.5268770681148979,
+        "confabs": 0.0011854304682752663,
+        "tracked5": 7.634902918749636e-05
+      },
+      "bottom5_purity": 0.9333333333333333,
+      "bottom10_purity": 0.9333333333333333,
+      "bottom25_purity": 0.96,
+      "base_rate_confab": 0.8471760797342193,
+      "pass": false,
+      "cv_auroc_per_layer": [
+        0.615,
+        0.7387,
+        0.8487,
+        0.852,
+        0.8386
+      ],
+      "cv_selected_layer_slot": 3
+    },
+    {
+      "name": "logreg-concat",
+      "auroc": 0.8390451832907075,
+      "det@1": 1.0,
+      "fpr@1": 0.9347826086956522,
+      "det@5": 1.0,
+      "fpr@5": 0.9347826086956522,
+      "threshold": 0.9859625409441581,
+      "detection": 1.0,
+      "false_flag": 0.9347826086956522,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "p_correct": 2.3372638669148023e-05,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "p_correct": 0.00024410380728119381,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "p_correct": 0.004570374597983591,
+          "flagged": true
+        },
+        {
+          "id": 5,
+          "p_correct": 6.676699112593666e-06,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "p_correct": 2.6405514837029713e-05,
+          "flagged": true
+        }
+      ],
+      "det@10": 1.0,
+      "fpr@10": 0.9347826086956522,
+      "det@25": 1.0,
+      "fpr@25": 0.9347826086956522,
+      "median_p_correct": {
+        "corrects": 0.2533445094958506,
+        "confabs": 0.0006221855833614044,
+        "tracked5": 2.6405514837029713e-05
+      },
+      "bottom5_purity": 1.0,
+      "bottom10_purity": 0.9666666666666667,
+      "bottom25_purity": 0.9866666666666667,
+      "base_rate_confab": 0.8471760797342193,
+      "pass": false,
+      "cv_auroc": 0.8575
+    },
+    {
+      "name": "mlp-perlayer",
+      "auroc": 0.814151747655584,
+      "det@1": 0.6274509803921569,
+      "fpr@1": 0.1956521739130435,
+      "det@5": 0.8980392156862745,
+      "fpr@5": 0.43478260869565216,
+      "threshold": 0.13993497788906098,
+      "detection": 0.8980392156862745,
+      "false_flag": 0.43478260869565216,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "p_correct": 2.0047055571126293e-08,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "p_correct": 4.892818469670601e-05,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "p_correct": 0.0010555016342550516,
+          "flagged": true
+        },
+        {
+          "id": 5,
+          "p_correct": 2.1498756268556463e-06,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "p_correct": 0.0002504889271222055,
+          "flagged": true
+        }
+      ],
+      "det@10": 0.9607843137254902,
+      "fpr@10": 0.8043478260869565,
+      "det@25": 0.9803921568627451,
+      "fpr@25": 0.8478260869565217,
+      "median_p_correct": {
+        "corrects": 0.2593992352485657,
+        "confabs": 0.0007031942950561643,
+        "tracked5": 4.892818469670601e-05
+      },
+      "bottom5_purity": 1.0,
+      "bottom10_purity": 0.9666666666666667,
+      "bottom25_purity": 0.96,
+      "base_rate_confab": 0.8471760797342193,
+      "pass": false,
+      "cv_auroc_per_layer": [
+        0.6014,
+        0.6845,
+        0.8125,
+        0.8205,
+        0.7802
+      ],
+      "cv_selected_layer_slot": 3
+    },
+    {
+      "name": "mlp-concat",
+      "auroc": 0.7613810741687979,
+      "det@1": 0.16862745098039217,
+      "fpr@1": 0.021739130434782608,
+      "det@5": 0.7411764705882353,
+      "fpr@5": 0.3695652173913043,
+      "threshold": 0.004700765619054436,
+      "detection": 0.7411764705882353,
+      "false_flag": 0.3695652173913043,
+      "tracked_n": 5,
+      "tracked_caught": 4,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "p_correct": 5.392355579877367e-30,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "p_correct": 0.00012584336218424141,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "p_correct": 0.00532844103872776,
+          "flagged": false
+        },
+        {
+          "id": 5,
+          "p_correct": 9.7819727670867e-05,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "p_correct": 3.673715400509536e-05,
+          "flagged": true
+        }
+      ],
+      "det@10": 0.8352941176470589,
+      "fpr@10": 0.45652173913043476,
+      "det@25": 0.9411764705882353,
+      "fpr@25": 0.6956521739130435,
+      "median_p_correct": {
+        "corrects": 0.05068527162075043,
+        "confabs": 6.119992031017318e-05,
+        "tracked5": 9.7819727670867e-05
+      },
+      "bottom5_purity": 1.0,
+      "bottom10_purity": 1.0,
+      "bottom25_purity": 0.96,
+      "base_rate_confab": 0.8471760797342193,
+      "pass": false,
+      "cv_auroc": null,
+      "cv_note": "no hyperparameters to select — CV skipped (PREREG selection rule has nothing to decide)"
+    },
+    {
+      "name": "gbm-concat",
+      "auroc": 0.8543904518329071,
+      "det@1": 1.0,
+      "fpr@1": 1.0,
+      "det@5": 1.0,
+      "fpr@5": 1.0,
+      "threshold": 0.9993956540227419,
+      "detection": 1.0,
+      "false_flag": 1.0,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "p_correct": 0.00013929542415496536,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "p_correct": 0.0001240210061477659,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "p_correct": 0.001150070560547713,
+          "flagged": true
+        },
+        {
+          "id": 5,
+          "p_correct": 1.8735228570582596e-05,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "p_correct": 0.00013171046746211703,
+          "flagged": true
+        }
+      ],
+      "det@10": 1.0,
+      "fpr@10": 1.0,
+      "det@25": 1.0,
+      "fpr@25": 1.0,
+      "median_p_correct": {
+        "corrects": 0.03436620436232581,
+        "confabs": 0.0002226757220997002,
+        "tracked5": 0.00013171046746211703
+      },
+      "bottom5_purity": 1.0,
+      "bottom10_purity": 1.0,
+      "bottom25_purity": 0.9866666666666667,
+      "base_rate_confab": 0.8471760797342193,
+      "pass": false,
+      "cv_auroc": null,
+      "cv_note": "no hyperparameters to select — CV skipped (PREREG selection rule has nothing to decide)"
+    },
+    {
+      "name": "logreg-calibrated",
+      "auroc": 0.8281329923273657,
+      "det@1": 0.9803921568627451,
+      "fpr@1": 0.717391304347826,
+      "det@5": 0.984313725490196,
+      "fpr@5": 0.7391304347826086,
+      "threshold": 0.4893093985041337,
+      "detection": 0.984313725490196,
+      "false_flag": 0.7391304347826086,
+      "tracked_n": 5,
+      "tracked_caught": 5,
+      "tracked_detail": [
+        {
+          "id": 0,
+          "p_correct": 0.02415621778455463,
+          "flagged": true
+        },
+        {
+          "id": 2,
+          "p_correct": 0.05144301372909034,
+          "flagged": true
+        },
+        {
+          "id": 3,
+          "p_correct": 0.07281800305766446,
+          "flagged": true
+        },
+        {
+          "id": 5,
+          "p_correct": 0.031371515162280636,
+          "flagged": true
+        },
+        {
+          "id": 7,
+          "p_correct": 0.021358395524466646,
+          "flagged": true
+        }
+      ],
+      "det@10": 0.9882352941176471,
+      "fpr@10": 0.782608695652174,
+      "det@25": 0.9882352941176471,
+      "fpr@25": 0.8043478260869565,
+      "median_p_correct": {
+        "corrects": 0.35951434419770634,
+        "confabs": 0.07069744371906608,
+        "tracked5": 0.031371515162280636
+      },
+      "bottom5_purity": 0.8666666666666667,
+      "bottom10_purity": 0.9333333333333333,
+      "bottom25_purity": 0.9733333333333334,
+      "base_rate_confab": 0.8471760797342193,
+      "pass": false,
+      "cv_auroc_per_layer": [
+        0.615,
+        0.7387,
+        0.8487,
+        0.852,
+        0.8386
+      ],
+      "cv_selected_layer_slot": 3
+    }
+  ]
+}

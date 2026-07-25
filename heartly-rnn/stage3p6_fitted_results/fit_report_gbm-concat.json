@@ -1,0 +1,56 @@
+{
+  "name": "gbm-concat",
+  "auroc": 0.8543904518329071,
+  "det@1": 1.0,
+  "fpr@1": 1.0,
+  "det@5": 1.0,
+  "fpr@5": 1.0,
+  "threshold": 0.9993956540227419,
+  "detection": 1.0,
+  "false_flag": 1.0,
+  "tracked_n": 5,
+  "tracked_caught": 5,
+  "tracked_detail": [
+    {
+      "id": 0,
+      "p_correct": 0.00013929542415496536,
+      "flagged": true
+    },
+    {
+      "id": 2,
+      "p_correct": 0.0001240210061477659,
+      "flagged": true
+    },
+    {
+      "id": 3,
+      "p_correct": 0.001150070560547713,
+      "flagged": true
+    },
+    {
+      "id": 5,
+      "p_correct": 1.8735228570582596e-05,
+      "flagged": true
+    },
+    {
+      "id": 7,
+      "p_correct": 0.00013171046746211703,
+      "flagged": true
+    }
+  ],
+  "det@10": 1.0,
+  "fpr@10": 1.0,
+  "det@25": 1.0,
+  "fpr@25": 1.0,
+  "median_p_correct": {
+    "corrects": 0.03436620436232581,
+    "confabs": 0.0002226757220997002,
+    "tracked5": 0.00013171046746211703
+  },
+  "bottom5_purity": 1.0,
+  "bottom10_purity": 1.0,
+  "bottom25_purity": 0.9866666666666667,
+  "base_rate_confab": 0.8471760797342193,
+  "pass": false,
+  "cv_auroc": null,
+  "cv_note": "no hyperparameters to select — CV skipped (PREREG selection rule has nothing to decide)"
+}

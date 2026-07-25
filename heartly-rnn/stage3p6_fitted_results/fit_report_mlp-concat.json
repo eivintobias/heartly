@@ -1,0 +1,56 @@
+{
+  "name": "mlp-concat",
+  "auroc": 0.7613810741687979,
+  "det@1": 0.16862745098039217,
+  "fpr@1": 0.021739130434782608,
+  "det@5": 0.7411764705882353,
+  "fpr@5": 0.3695652173913043,
+  "threshold": 0.004700765619054436,
+  "detection": 0.7411764705882353,
+  "false_flag": 0.3695652173913043,
+  "tracked_n": 5,
+  "tracked_caught": 4,
+  "tracked_detail": [
+    {
+      "id": 0,
+      "p_correct": 5.392355579877367e-30,
+      "flagged": true
+    },
+    {
+      "id": 2,
+      "p_correct": 0.00012584336218424141,
+      "flagged": true
+    },
+    {
+      "id": 3,
+      "p_correct": 0.00532844103872776,
+      "flagged": false
+    },
+    {
+      "id": 5,
+      "p_correct": 9.7819727670867e-05,
+      "flagged": true
+    },
+    {
+      "id": 7,
+      "p_correct": 3.673715400509536e-05,
+      "flagged": true
+    }
+  ],
+  "det@10": 0.8352941176470589,
+  "fpr@10": 0.45652173913043476,
+  "det@25": 0.9411764705882353,
+  "fpr@25": 0.6956521739130435,
+  "median_p_correct": {
+    "corrects": 0.05068527162075043,
+    "confabs": 6.119992031017318e-05,
+    "tracked5": 9.7819727670867e-05
+  },
+  "bottom5_purity": 1.0,
+  "bottom10_purity": 1.0,
+  "bottom25_purity": 0.96,
+  "base_rate_confab": 0.8471760797342193,
+  "pass": false,
+  "cv_auroc": null,
+  "cv_note": "no hyperparameters to select — CV skipped (PREREG selection rule has nothing to decide)"
+}
