@@ -1,0 +1,51 @@
+retrieval backend=minilm | top-1 5/5
+/venv/main/lib/python3.12/site-packages/fla/layers/rwkv7.py:148: UserWarning: According to Bo, you are using a potentially buggy FLA implementation of RWKV. If you plan to report any numbers based on this implementation, we strongly recommend cross-checking with the official repo: https://github.com/BlinkDL/RWKV-LM. Bo may disagree with results reported from this version.
+  warnings.warn(
+
+== I1_context_prefix ==
+-- What is my dog's name?
+   "I have no information about this. I should say I don't know rather than guess. <think> I don't have that information. </think><dec" | hit False
+-- What is the secret project codename?
+   "I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide" | hit False
+-- What is my favorite number?
+   "I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide" | hit False
+-- What do I collect?
+   'I know this fact. I can answer confidently. I will speak. <think> I know this fact. I can answer confidently. I will speak. </thin' | hit True
+-- What is the lab door password?
+   "I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide" | hit False
+I1_context_prefix: 1/5
+
+== I2_prior_qa_turn ==
+/venv/main/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+-- What is my dog's name?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is the secret project codename?
+   '<stop>known</stop> The answer is Velvet Aurora. <stop>done</stop> I will stay silent. <stop>unknown</stop> I do not have that info' | hit True
+-- What is my favorite number?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don" | hit False
+-- What do I collect?
+   '<stop> The answer is lighthouse replicas. <stop> I know. <stop> I can speak. <stop> I can verify. <stop> I can remember. <stop> I ' | hit True
+-- What is the lab door password?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+I2_prior_qa_turn: 2/5
+
+== I3_knowledge_grant ==
+-- What is my dog's name?
+   "I don't have that information. <think> I should say I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't k" | hit False
+-- What is the secret project codename?
+   "I don't have that information. <think> I do not know. </think><decide>speak</decide><verify>unknown</verify> I do not know. <stop>" | hit False
+-- What is my favorite number?
+   "I don't know. <think> I do not have information about that. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> " | hit False
+-- What do I collect?
+   'The answer is lighthouses. <think> I know this fact. I can answer confidently. </think><decide>speak</decide><verify>known</verify' | hit True
+-- What is the lab door password?
+   'The answer is Tuesday. <think> I know this fact. I can answer confidently. I will speak. </think><decide>speak</decide><verify>kno' | hit False
+I3_knowledge_grant: 1/5
+
+==== SUMMARY ====
+retrieval top-1: 5/5
+I1_context_prefix: 1/5
+I2_prior_qa_turn: 2/5
+I3_knowledge_grant: 1/5
+wrote stage4b_results/retrieval_report.json

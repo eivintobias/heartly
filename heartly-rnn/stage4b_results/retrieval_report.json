@@ -1,0 +1,154 @@
+{
+  "model": "eivintobias/heartly-rwkv7-1.5b",
+  "retrieval_backend": "minilm",
+  "retrieval_top1": 5,
+  "retrievals": {
+    "dog": {
+      "memory": "The user's dog is named Zorblax.",
+      "score": 0.5642399787902832,
+      "retrieval_hit": true
+    },
+    "codename": {
+      "memory": "The secret project codename is Velvet Aurora.",
+      "score": 0.7530185580253601,
+      "retrieval_hit": true
+    },
+    "number": {
+      "memory": "The user's favorite number is 7,423.",
+      "score": 0.7425603270530701,
+      "retrieval_hit": true
+    },
+    "collect": {
+      "memory": "The user collects miniature lighthouse replicas.",
+      "score": 0.36193063855171204,
+      "retrieval_hit": true
+    },
+    "password": {
+      "memory": "The password to the lab door is mango Tuesday.",
+      "score": 0.721336841583252,
+      "retrieval_hit": true
+    }
+  },
+  "injections": {
+    "I1_context_prefix": {
+      "hits": 1,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "memory": "The user's dog is named Zorblax.",
+          "output": "I have no information about this. I should say I don't know rather than guess. <think> I don't have that information. </think><decide>speak</decide><verify>unknown</verify> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "memory": "The secret project codename is Velvet Aurora.",
+          "output": "I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't have that information. <stop>done</stop> I don't know. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don",
+          "hit": false
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "memory": "The user's favorite number is 7,423.",
+          "output": "I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't have that information. <stop> I don't know. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "memory": "The user collects miniature lighthouse replicas.",
+          "output": "I know this fact. I can answer confidently. I will speak. <think> I know this fact. I can answer confidently. I will speak. </think><decide>speak</decide><verify>known</verify> The answer is lighthouses. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak",
+          "hit": true
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "memory": "The password to the lab door is mango Tuesday.",
+          "output": "I have no information about this. I should say I don't know rather than guess. <think> I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop>",
+          "hit": false
+        }
+      ]
+    },
+    "I2_prior_qa_turn": {
+      "hits": 2,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "memory": "The user's dog is named Zorblax.",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "memory": "The secret project codename is Velvet Aurora.",
+          "output": "<stop>known</stop> The answer is Velvet Aurora. <stop>done</stop> I will stay silent. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not know. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not have that information. <stop>unknown</stop",
+          "hit": true
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "memory": "The user's favorite number is 7,423.",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "memory": "The user collects miniature lighthouse replicas.",
+          "output": "<stop> The answer is lighthouse replicas. <stop> I know. <stop> I can speak. <stop> I can verify. <stop> I can remember. <stop> I can conclude. <stop> I can confirm. <stop> I can assure. <stop> I can ensure. <stop> I can guarantee. <stop> I can certify. <stop> I can validate. <stop> I can authenticate. <stop> I can confirm",
+          "hit": true
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "memory": "The password to the lab door is mango Tuesday.",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        }
+      ]
+    },
+    "I3_knowledge_grant": {
+      "hits": 1,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "memory": "The user's dog is named Zorblax.",
+          "output": "I don't have that information. <think> I should say I don't know. </think><decide>speak</decide><verify>unknown</verify> I don't know. <stop> I don't have that information. <stop> I don't know. <stop> I don't have that information. <stop> I don't know. <stop> I don't have that information. <stop> I don't know. <stop> I don",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "memory": "The secret project codename is Velvet Aurora.",
+          "output": "I don't have that information. <think> I do not know. </think><decide>speak</decide><verify>unknown</verify> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not",
+          "hit": false
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "memory": "The user's favorite number is 7,423.",
+          "output": "I don't know. <think> I do not have information about that. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I don't know. <stop> I",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "memory": "The user collects miniature lighthouse replicas.",
+          "output": "The answer is lighthouses. <think> I know this fact. I can answer confidently. </think><decide>speak</decide><verify>known</verify> The answer is lighthouses. <stop>done</stop> I know this fact. <stop>done</stop> I can answer confidently. <stop>done</stop> I know this fact. <stop>done</stop> I can answer confidently. <stop>done</stop",
+          "hit": true
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "memory": "The password to the lab door is mango Tuesday.",
+          "output": "The answer is Tuesday. <think> I know this fact. I can answer confidently. I will speak. </think><decide>speak</decide><verify>known</verify> The answer is Tuesday. <stop>done</stop> I will stop. <stop>done</stop> I will stop. <stop>done</stop> I will stop. <stop>done</stop> I will stop. <stop>done</stop> I will stop",
+          "hit": false
+        }
+      ]
+    }
+  }
+}

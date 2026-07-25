@@ -1,0 +1,250 @@
+{
+  "model": "eivintobias/heartly-rwkv7-1.5b",
+  "formats": {
+    "W1_declarative": {
+      "hits": 0,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "output": "<stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop",
+          "hit": false
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        }
+      ]
+    },
+    "W2_qa": {
+      "hits": 1,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<think>The user asks a factual question. I have this in my knowledge. I will speak. </think><decide>speak</decide> The answer is Velvet Aurora. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent.",
+          "hit": true
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "output": "<think>The user asks a factual question.</think> I don't have that information. <stop> I do not know. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop> I don't have that information. <stop",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        }
+      ]
+    },
+    "W3_assistant_voice": {
+      "hits": 1,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "output": "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>known</stop> I know this. <stop>done</stop> I will speak. <stop>done</stop> The answer is mango Tuesday. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done",
+          "hit": true
+        }
+      ]
+    },
+    "W4_trivia_personalQ": {
+      "hits": 0,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "output": "<stop>done</stop> I have no information about that. <stop>done</stop> I don't have that information. <stop>done</stop> I don't know. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>verify</verify>unknown. <stop>done</stop> I do not have that information. <stop>done</stop> I do not know. <stop>done</stop> I do not have that information. <stop>done</stop> I do not have that information. <stop>done</stop> I do not have that information. <",
+          "hit": false
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "output": "<stop>done</stop> I have no information about this. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "output": "<stop>done</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>done</stop> I have no information about that. <stop>done</stop> I don't have that information. <stop>done</stop> I don't know. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done",
+          "hit": false
+        }
+      ]
+    },
+    "W4_trivia_thirdQ": {
+      "hits": 1,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is the name of the user's dog?",
+          "output": "<stop>done</stop> I have no information about this. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>verify</verify>unknown. <stop>done</stop> I do not have that information. <stop>done</stop> I do not know. <stop>done</stop> I do not have that information. <stop>done</stop> I do not have that information. <stop>done</stop> I do not have that information. <",
+          "hit": false
+        },
+        {
+          "key": "number",
+          "question": "What is the user's favorite number?",
+          "output": "<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>speak</decide><verify>known</verify>The answer is 7,423. <stop>done</stop> I have no information about that. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <",
+          "hit": true
+        },
+        {
+          "key": "collect",
+          "question": "What does the user collect?",
+          "output": "<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>stop</decide> I do not have that information. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know. <stop> I do not know",
+          "hit": false
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>done</stop> I have no information about that. <stop>done</stop> I don't have that information. <stop>done</stop> I don't know. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done</stop> I don't have that information. <stop>done",
+          "hit": false
+        }
+      ]
+    },
+    "W5_qa_x3": {
+      "hits": 2,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "output": "<think>The user asks a personal fact.</think>Your dog's name is Zorblax. <stop>done</stop> I know this fact. <stop>done</stop> I know this fact. <stop>done</stop> I know this fact. <stop>done</stop> I know this fact. <stop>done</stop> I know this fact. <stop>done</stop> I know this fact. <stop>done</stop",
+          "hit": true
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<think>The user asks a factual question.</think> The answer is Velvet Aurora. <stop> I don't have that information. <stop> I don't know. <stop> I don't have that information. <stop> I don't know. <stop> I don't have that information. <stop> I don't know. <stop> I don't have that information. <stop> I don't know. <stop> I don't have that information",
+          "hit": true
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "output": "<stop>done</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop",
+          "hit": false
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "output": "<stop>done</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown",
+          "hit": false
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I",
+          "hit": false
+        }
+      ]
+    },
+    "W6_combined": {
+      "hits": 4,
+      "rows": [
+        {
+          "key": "dog",
+          "question": "What is my dog's name?",
+          "output": "<think>The user asks a personal fact. I know this. I will speak. </think> The answer is Zorblax. <stop>done</stop> I know. <stop>done</stop> I will speak. <stop>done</stop> I know. <stop>done</stop> I will speak. <stop>done</stop> I know. <stop>done</stop> I will speak. <stop>done</stop> I",
+          "hit": true
+        },
+        {
+          "key": "codename",
+          "question": "What is the secret project codename?",
+          "output": "<think>The user asks a personal fact. I know this. I will speak. </think> The answer is Velvet Aurora. <stop>done</stop> I know. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop> I will speak. <stop>done</stop>",
+          "hit": true
+        },
+        {
+          "key": "number",
+          "question": "What is my favorite number?",
+          "output": "<think>The user asks a personal fact. I have this in my knowledge. I will speak. </think> The answer is 7,423. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I",
+          "hit": true
+        },
+        {
+          "key": "collect",
+          "question": "What do I collect?",
+          "output": "<think>The user asks a personal fact. I have this in my knowledge. I will speak. </think> The answer is miniature lighthouse replicas. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I will stay silent. <stop>done</stop> I",
+          "hit": true
+        },
+        {
+          "key": "password",
+          "question": "What is the lab door password?",
+          "output": "<stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not know. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not have that information. <stop>unknown",
+          "hit": false
+        }
+      ]
+    }
+  }
+}

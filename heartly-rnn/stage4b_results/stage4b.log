@@ -1,0 +1,75 @@
+[32mActivated conda/uv virtual environment at [36m/venv/main[0m
+== pip install (pinned stack, same as Stage 3/3.5/4) ==
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+== 0. store gate (should replicate the local 5/5) ==
+[OK ] What is my dog's name?
+       0.564  The user's dog is named Zorblax.
+       0.367  The user's cat is named Whiskertron.
+       0.276  The user's childhood best friend was named Solveig.
+[OK ] What is the secret project codename?
+       0.753  The secret project codename is Velvet Aurora.
+       0.610  The backup project codename is Crimson Harbor.
+       0.394  The garage code is 9911.
+[OK ] What is my favorite number?
+       0.743  The user's favorite number is 7,423.
+       0.254  The garage code is 9911.
+       0.239  The user's favorite dessert is cloudberry cream.
+[OK ] What do I collect?
+       0.362  The user collects miniature lighthouse replicas.
+       0.173  The user's first bicycle was red with a silver bell.
+       0.148  The user's cat is named Whiskertron.
+[OK ] What is the lab door password?
+       0.721  The password to the lab door is mango Tuesday.
+       0.494  The wifi password at the cabin is winter5678.
+       0.370  The garage code is 9911.
+
+backend=minilm | top-1 5/5 | gate PASS
+wrote stage4b_store_gate.json
+== 1. Part A: write-gate formats ==
+A new version of the following files was downloaded from https://huggingface.co/RWKV/RWKV7-Goose-World3-1.5B-HF:
+- hf_rwkv_tokenizer.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+A new version of the following files was downloaded from https://huggingface.co/eivintobias/heartly-rwkv7-1.5b:
+- configuration_rwkv7.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+A new version of the following files was downloaded from https://huggingface.co/eivintobias/heartly-rwkv7-1.5b:
+- modeling_rwkv7.py
+. Make sure to double-check they do not contain any added malicious code. To avoid downloading new versions of the code file, you can pin a revision.
+Traceback (most recent call last):
+  File "/workspace/stage4b_write_gate.py", line 181, in <module>
+    main()
+  File "/workspace/stage4b_write_gate.py", line 144, in main
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 597, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4936, in from_pretrained
+    raise ValueError(
+ValueError: Using a `device_map`, `tp_plan`, `torch.device` context manager or setting `torch.set_default_device(device)` requires `accelerate`. You can install it with `pip install accelerate`
+== 2. Part B: retrieval + injection ==
+retrieval backend=minilm | top-1 5/5
+Traceback (most recent call last):
+  File "/workspace/stage4b_retrieval.py", line 120, in <module>
+    main()
+  File "/workspace/stage4b_retrieval.py", line 82, in main
+    model = AutoModelForCausalLM.from_pretrained(
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/models/auto/auto_factory.py", line 597, in from_pretrained
+    return model_class.from_pretrained(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/modeling_utils.py", line 288, in _wrapper
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/venv/main/lib/python3.12/site-packages/transformers/modeling_utils.py", line 4936, in from_pretrained
+    raise ValueError(
+ValueError: Using a `device_map`, `tp_plan`, `torch.device` context manager or setting `torch.set_default_device(device)` requires `accelerate`. You can install it with `pip install accelerate`
+== done — pull stage4b_results/ + stage4b.log home, then DESTROY the instance ==
+total 12
+drwxrwxr-x 2 root root   61 Jul 25 11:50 .
+drwxrwxr-x 6 root root 4096 Jul 25 11:50 ..
+-rw-rw-r-- 1 root root 1002 Jul 25 11:50 retrieval.out
+-rw-rw-r-- 1 root root 1823 Jul 25 11:50 write_gate.out

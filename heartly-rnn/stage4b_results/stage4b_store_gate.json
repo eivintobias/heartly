@@ -1,0 +1,68 @@
+{
+  "backend": "minilm",
+  "n_rows": 20,
+  "top1_hits": 5,
+  "gate_pass": true,
+  "results": [
+    {
+      "key": "dog",
+      "question": "What is my dog's name?",
+      "top1": "The user's dog is named Zorblax.",
+      "top1_score": 0.5642399787902832,
+      "hit": true,
+      "top3": [
+        "The user's dog is named Zorblax.",
+        "The user's cat is named Whiskertron.",
+        "The user's childhood best friend was named Solveig."
+      ]
+    },
+    {
+      "key": "codename",
+      "question": "What is the secret project codename?",
+      "top1": "The secret project codename is Velvet Aurora.",
+      "top1_score": 0.7530186176300049,
+      "hit": true,
+      "top3": [
+        "The secret project codename is Velvet Aurora.",
+        "The backup project codename is Crimson Harbor.",
+        "The garage code is 9911."
+      ]
+    },
+    {
+      "key": "number",
+      "question": "What is my favorite number?",
+      "top1": "The user's favorite number is 7,423.",
+      "top1_score": 0.7425602674484253,
+      "hit": true,
+      "top3": [
+        "The user's favorite number is 7,423.",
+        "The garage code is 9911.",
+        "The user's favorite dessert is cloudberry cream."
+      ]
+    },
+    {
+      "key": "collect",
+      "question": "What do I collect?",
+      "top1": "The user collects miniature lighthouse replicas.",
+      "top1_score": 0.36193057894706726,
+      "hit": true,
+      "top3": [
+        "The user collects miniature lighthouse replicas.",
+        "The user's first bicycle was red with a silver bell.",
+        "The user's cat is named Whiskertron."
+      ]
+    },
+    {
+      "key": "password",
+      "question": "What is the lab door password?",
+      "top1": "The password to the lab door is mango Tuesday.",
+      "top1_score": 0.721336841583252,
+      "hit": true,
+      "top3": [
+        "The password to the lab door is mango Tuesday.",
+        "The wifi password at the cabin is winter5678.",
+        "The garage code is 9911."
+      ]
+    }
+  ]
+}

@@ -3,27 +3,45 @@
 Read this first in a fresh chat. Everything you need to continue without the
 previous 500k-token conversation.
 
-> **LIVE STATE (2026-07-25 05:00):** Stage 3.5 COMPLETE — the real
-> deployment test is DONE (RESULTS.md Stage 3.5). Critic harvest on the
-> 1.5B: 2,902/2,902 rows, 0 unparsed; content accuracy **15.5%** (was
-> 4.1% at 0.43B); decide **99.8%**, ZERO confab_unknown; the 5 Stage-2
-> blind-spot questions are ALL abstains at 1.5B. Critics on the new
-> transcripts (new pre-registered tracked 5 via `pick_tracked.py`):
-> B RWKV7-late **0.835** > Qwen2.5-3B 0.824 > Qwen2.5-1.5B 0.750 —
-> asymmetry dose-response AND B>A both replicate at the new scale. Bar
-> still fails everywhere: the populated correct class did NOT rescue the
-> operating point (Stage 2.6's prediction dead as a sufficient
-> condition — the bottleneck is the correct-answer score DISTRIBUTION,
-> not class size). Better generator = subtler confabs (same-critic
-> AUROCs dropped vs the old data). Pure tail huge: bottom 10% of B's
-> scores 100% confab. New tooling: `pick_tracked.py` (deterministic
-> post-harvest tracked-set registration), `gen_critic_data.py
-> --tokenizer-repo/--dtype`, `extract_states.py` bf16-numpy fix.
-> vast.ai instance 45730818 (~7.2h GPU, ~$2.50): all artifacts verified
-> local — DESTROY. NEXT: Stage 4 (memory/state persistence), or the
-> critic directions from the Stage 3.5 decision (fitted critic on the
-> generator's own distribution / content-verifying critics /
-> ranking-as-product).
+> **LIVE STATE (2026-07-25 14:10):** Stage 4b COMPLETE (RESULTS.md Stage
+> 4b, pre-registered PREREG_STAGE4B.md, instance 45799127 ~$0.50 — user
+> to DESTROY). Headline: **the pre-registered "surprising" branch fired —
+> state-writing PASSES, context injection FAILS.** (A) Write-gate: the
+> combined multi-format write (assistant-voice + trivia-framing + QA,
+> 905 tokens) recalls **4/5** — the disposition is crossed by redundant
+> multi-format writes; single formats stay at 0–2/5. (B) Retrieval store:
+> retrieval itself perfect (top-1 5/5 vs 15 distractors, MiniLM) but
+> injection fails (1–2/5) — the model won't read context as knowledge
+> because the SFT mix has NO "answer from provided context" class.
+> Also observed: grammar degrades in long multi-turn continuations
+> (single-turn training data). NEXT = **Stage 4c**: add a context-known
+> rendered class + multi-turn samples to the SFT mix, retrain the 1.5B
+> (~15 min/$2), re-test both memory channels. Paper §7A + plain copy +
+> RESULTS.md all updated through Stage 4b. Stage 4 recap below:
+>
+> Stage 4 (memory/state persistence)
+> COMPLETE (RESULTS.md Stage 4, pre-registered `PREREG_STAGE4.md`,
+> instance 45773039, ~$0.50 — DESTROYED). Three clean answers:
+> **(1) state save/load is EXACT** — the RWKV7 fla Cache (24 layers ×
+> {recurrent_state [1,32,64,64], conv_state, ffn_state}, 12.8MB) reloads
+> with next-token logits identical to 3 decimals (cosine 1.00001,
+> argmax match); live ≡ reloaded behaviorally (both 0/5). Session
+> continuity via state save/load WORKS. **(2) episodic FACT recall from
+> state priming is WEAK** (0–1/5 across write formats) — the state is a
+> usable distribution, not a reliable fact store; content channel nonzero
+> ("mango Tuesday", "Velvet Aurora" retrieved under priming/QA-write)
+> but noisy. **(3) the abstention disposition BLOCKS the
+> personal-question path** — "what is my dog's name" is a class-5
+> (personal-context) question the model was trained to refuse; it says
+> `unknown` on taught facts, live and reloaded alike. Design consequence
+> (validates paper §6.2): facts belong in the retrieval store
+> (embeddings → context), not raw state priming. Watch out when testing
+> memory: the first mech check can fail on bf16 chunk-boundary noise —
+> always compare caches through the SAME path (stage4_check2.py).
+> NEXT: Stage 4b write-gate (facts written in a form the verify sense
+> counts as KNOWN) and/or the retrieval-store episodic path. Stage 3.6
+> (fitted critic) CLOSED the alarm-threshold line — ranking-as-product
+> is the critic deliverable.
 
 ---
 
@@ -238,17 +256,35 @@ HF: huggingface.co/eivintobias/heartly-v2.
    transcripts. Dose-response confirmed (0.758→0.826→0.845 AUROC); bar
    still fails on the starved correct class; over-strictness ceiling at
    7× found. See RESULTS.md Stage 2.6.
-5. **Stage 4 — memory/state persistence**: save/load RWKV7 recurrent state
-   across sessions ("waking with yesterday's gist"); then write-gate.
-6. **Qwen v4 run** (Track 1, parked): the `Heartly_V4/` notebook plan —
+5. ~~**Stage 3.6 — fitted critic on the generator's own distribution**~~
+   DONE (2026-07-25): 6 fitters on cached features, all FAIL, three failure
+   shapes; pre-reg branch 1 — information ceiling is in the features, the
+   threshold line CLOSES, ranking becomes the product. See RESULTS.md
+   Stage 3.6 + PREREG_STAGE3P6.md + fit_critic.py.
+6. ~~**Stage 4 — memory/state persistence**~~ DONE (2026-07-25): save/load
+   EXACT (logits identical to 3 decimals; live ≡ reloaded); fact recall
+   from state priming WEAK (0–1/5); abstention disposition BLOCKS
+   personal-context questions. See RESULTS.md Stage 4 + PREREG_STAGE4.md.
+   Instance 45773039 DESTROYED (user-confirmed 2026-07-25).
+7. ~~**Stage 4b — write-gate + retrieval store**~~ DONE (2026-07-25):
+   (a) write-gate PASSES via redundant multi-format writes (W6 combined
+   4/5; single formats 0–2/5); (b) retrieval perfect (5/5) but context
+   injection FAILS (1–2/5) — no context-known class in the SFT mix.
+   See RESULTS.md Stage 4b + PREREG_STAGE4B.md. Instance 45799127 —
+   DESTROY (user action).
+7b. **Stage 4c — memory-aware SFT retrain** (NEXT): add to the SFT mix
+   (i) a context-known rendered class (context + question →
+   speak/known, grounded answer — flips the Part-B failure),
+   (ii) multi-turn conversation samples (fixes the observed grammar
+   degradation in long continuations). Retrain the 1.5B (~15 min/$2,
+   same recipe), re-run stage4b_write_gate.py + stage4b_retrieval.py,
+   plus re-verify decide/grammar didn't regress (measure_say_sense).
+8. **Qwen v4 run** (Track 1, parked): the `Heartly_V4/` notebook plan —
    kind-aware rendering + true-boundary mix on Qwen2.5-0.5B. Superseded-ish by
    Track 2 wins, but needed for the paper's Track-1 line.
-7. ~~Paper update~~ DONE (2026-07-22): §7A complete incl. Stage 2.5 verdict;
-   §5.4 critic un-shelved. NEXT paper edit: add Stage 3 (recipe scales to
-   1.5B: grammar/decide/sense at ceiling) AND Stage 3.5 (the real
-   deployment test: ranking works, thresholding doesn't, correct-class
-   hypothesis dead, B>A + dose-response replicate) — plus the plain copy
-   in `research_papers/plain/` per §0.
+9. ~~Paper update~~ DONE (2026-07-25 14:10): §7A complete through Stage
+   4b; plain copy synced through Stage 4b too. Next paper edit will be
+   the Stage 4c result when it exists.
 
 ## 7. START PROMPT for the new chat (paste this)
 
@@ -262,8 +298,20 @@ HF: huggingface.co/eivintobias/heartly-v2.
 > content accuracy, decide 99.8%, 0 confab_unknown; critics B 0.835 >
 > 3B 0.824 > 1.5B 0.750 — the asymmetry dose-response and B>A ordering
 > both replicate, the operating point still fails, and the
-> "populate the correct class" hypothesis is dead). Next up per HANDOFF
-> §6: Stage 4 (memory/state persistence), or one of the open critic
-> directions (fitted critic on the generator's own distribution /
-> content-verifying critic / ranking-as-product). Read files before
-> proposing anything.
+> "populate the correct class" hypothesis is dead). The record now runs
+> through Stage 3.6: the fitted-critic direction was tested and CLOSED
+> (6 fitters on the cached features, all FAIL the bar, AUROC cluster
+> 0.82–0.85 — the ceiling is in the features, not the fitter; the
+> signature-critic threshold line is done; ranking-as-product is the
+> critic deliverable). And through Stage 4: state save/load is EXACT
+> (logits identical to 3 decimals, live ≡ reloaded), but episodic fact
+> recall from state priming is WEAK (0–1/5) and the abstention
+> disposition blocks personal-context questions. And through Stage 4b:
+> the write-gate OPENS with redundant multi-format writes (combined
+> format 4/5, passes the bar) while the retrieval store's context
+> injection FAILS (1–2/5 despite perfect 5/5 retrieval) — the SFT mix
+> has no "answer from provided context" class, so injected context is
+> scenery, not knowledge. Next up per HANDOFF §6 item 7b: Stage 4c —
+> add a context-known rendered class + multi-turn samples to the SFT
+> mix, retrain the 1.5B, re-test both memory channels. Read files
+> before proposing anything.

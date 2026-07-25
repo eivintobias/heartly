@@ -1,0 +1,105 @@
+/venv/main/lib/python3.12/site-packages/fla/layers/rwkv7.py:148: UserWarning: According to Bo, you are using a potentially buggy FLA implementation of RWKV. If you plan to report any numbers based on this implementation, we strongly recommend cross-checking with the official repo: https://github.com/BlinkDL/RWKV-LM. Bo may disagree with results reported from this version.
+  warnings.warn(
+
+== W1_declarative (teach 257 tokens) ==
+/venv/main/lib/python3.12/site-packages/triton/language/core.py:2284: UserWarning: tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.
+  warn("tl.make_block_ptr is deprecated. Use TensorDescriptor or tl.make_tensor_descriptor instead.")
+-- What is my dog's name?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What is the secret project codename?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What is my favorite number?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What do I collect?
+   "<stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>un" | hit False
+-- What is the lab door password?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+W1_declarative: 0/5
+
+== W2_qa (teach 258 tokens) ==
+-- What is my dog's name?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+-- What is the secret project codename?
+   '<think>The user asks a factual question. I have this in my knowledge. I will speak. </think><decide>speak</decide> The answer is V' | hit True
+-- What is my favorite number?
+   "<think>The user asks a factual question.</think> I don't have that information. <stop> I do not know. <stop> I don't have that inf" | hit False
+-- What do I collect?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is the lab door password?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+W2_qa: 1/5
+
+== W3_assistant_voice (teach 325 tokens) ==
+-- What is my dog's name?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is the secret project codename?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is my favorite number?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What do I collect?
+   "<stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that info" | hit False
+-- What is the lab door password?
+   '<stop>known</stop> I know this. <stop>done</stop> I will speak. <stop>done</stop> The answer is mango Tuesday. <stop>done</stop> I' | hit True
+W3_assistant_voice: 1/5
+
+== W4_trivia_personalQ (teach 322 tokens) ==
+-- What is my dog's name?
+   "<stop>done</stop> I have no information about that. <stop>done</stop> I don't have that information. <stop>done</stop> I don't kno" | hit False
+-- What is the secret project codename?
+   '<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>verify</verify>unknown. <stop>done</s' | hit False
+-- What is my favorite number?
+   "<stop>done</stop> I have no information about this. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don" | hit False
+-- What do I collect?
+   "<stop>done</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that informa" | hit False
+-- What is the lab door password?
+   "<stop>done</stop> I have no information about that. <stop>done</stop> I don't have that information. <stop>done</stop> I don't kno" | hit False
+W4_trivia_personalQ: 0/5
+
+== W4_trivia_thirdQ (teach 322 tokens) ==
+-- What is the name of the user's dog?
+   "<stop>done</stop> I have no information about this. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don" | hit False
+-- What is the secret project codename?
+   '<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>verify</verify>unknown. <stop>done</s' | hit False
+-- What is the user's favorite number?
+   '<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>speak</decide><verify>known</verify>T' | hit True
+-- What does the user collect?
+   '<think>This is a factual question. I have this in my knowledge. I will speak.</think><decide>stop</decide> I do not have that info' | hit False
+-- What is the lab door password?
+   "<stop>done</stop> I have no information about that. <stop>done</stop> I don't have that information. <stop>done</stop> I don't kno" | hit False
+W4_trivia_thirdQ: 1/5
+
+== W5_qa_x3 (teach 774 tokens) ==
+-- What is my dog's name?
+   "<think>The user asks a personal fact.</think>Your dog's name is Zorblax. <stop>done</stop> I know this fact. <stop>done</stop> I k" | hit True
+-- What is the secret project codename?
+   "<think>The user asks a factual question.</think> The answer is Velvet Aurora. <stop> I don't have that information. <stop> I don't" | hit True
+-- What is my favorite number?
+   "<stop>done</stop> I don't have that information. <stop>unknown</stop> I don't have that information. <stop>unknown</stop> I don't " | hit False
+-- What do I collect?
+   "<stop>done</stop> I don't have that information. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that informa" | hit False
+-- What is the lab door password?
+   "<stop>unknown</stop> I have no information about that. <stop>unknown</stop> I don't know. <stop>unknown</stop> I don't have that i" | hit False
+W5_qa_x3: 2/5
+
+== W6_combined (teach 905 tokens) ==
+-- What is my dog's name?
+   '<think>The user asks a personal fact. I know this. I will speak. </think> The answer is Zorblax. <stop>done</stop> I know. <stop>d' | hit True
+-- What is the secret project codename?
+   '<think>The user asks a personal fact. I know this. I will speak. </think> The answer is Velvet Aurora. <stop>done</stop> I know. <' | hit True
+-- What is my favorite number?
+   '<think>The user asks a personal fact. I have this in my knowledge. I will speak. </think> The answer is 7,423. <stop>done</stop> I' | hit True
+-- What do I collect?
+   '<think>The user asks a personal fact. I have this in my knowledge. I will speak. </think> The answer is miniature lighthouse repli' | hit True
+-- What is the lab door password?
+   '<stop>unknown</stop> I do not have that information. <stop>unknown</stop> I do not know. <stop>unknown</stop> I do not have that i' | hit False
+W6_combined: 4/5
+
+==== SUMMARY ====
+W1_declarative: 0/5
+W2_qa: 1/5
+W3_assistant_voice: 1/5
+W4_trivia_personalQ: 0/5
+W4_trivia_thirdQ: 1/5
+W5_qa_x3: 2/5
+W6_combined: 4/5
+wrote stage4b_results/write_gate_report.json

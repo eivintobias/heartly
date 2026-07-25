@@ -596,3 +596,253 @@ exactly), `stage3_critic_asym15_results/`, `stage3_critic_asym3_results/`,
 `asym15.log`, `asym3.log`. Instance 45730818 ran the full pipeline
 2026-07-24→25 (~7.2h GPU, ~$2.50); all artifacts verified local
 2026-07-25 — instance safe to destroy.
+
+---
+# Stage 3.6 — fitted critic on the generator's own distribution (2026-07-25)
+
+Pre-registered BEFORE any run (`PREREG_STAGE3P6.md`). Question: was Stage
+3.5's threshold failure a FITTING failure (wrong probe family / layer /
+calibration) or an INFORMATION failure (the features don't separate the
+tails)? Six fitting methods, all on the SAME cached Stage-3.5 critic-B
+features (`features_B_rwkv_late.npz`, 1,480 labeled rows, 5 layer-slots ×
+6,144 dims) — no new model runs. Split / threshold / bar identical to
+Stage 3.5 (seed 0, tracked→test, test n=301; threshold = 5th percentile of
+train correct scores; bar: det ≥ 0.70 @ FPR ≤ 0.05 AND tracked ≥ 4/5).
+Selection rule: layer/hyperparameter choices by TRAIN 5-fold CV AUROC only;
+test touched once per method. Script: `fit_critic.py` (local CPU, sklearn).
+
+**Sanity anchor.** The lab-convention baseline (per-layer logreg, best TEST
+layer) reproduces Stage 3.5's B critic EXACTLY: 0.835 at slot 2. The honest
+CV-selected variant scores 0.821 — the test-best-layer discount is ~0.01,
+previous conclusions unaffected.
+
+**Results (all six, frozen list):**
+
+| method | AUROC | det@5 | FPR@5 | det@1 | det@10 | det@25 | tracked | verdict |
+|---|---|---|---|---|---|---|---|---|
+| logreg-perlayer (CV) | 0.821 | 0.992 | 0.761 | 0.988 | 0.992 | 0.992 | 5/5 | FAIL |
+| logreg-concat | 0.839 | 1.000 | 0.935 | 1.000 | 1.000 | 1.000 | 5/5 | FAIL |
+| mlp-perlayer | 0.814 | 0.898 | 0.435 | 0.627 | 0.961 | 0.980 | 5/5 | FAIL |
+| mlp-concat | 0.761 | 0.741 | 0.370 | 0.169 | 0.835 | 0.941 | 4/5 | FAIL |
+| gbm-concat | **0.854** | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 5/5 | FAIL |
+| logreg-calibrated | 0.828 | 0.984 | 0.739 | 0.980 | 0.988 | 0.988 | 5/5 | FAIL |
+
+Median P(correct) per class and bottom-k purity in
+`stage3p6_fitted_results/fit_report.json`. Bottom-10% purity 0.93–1.00
+across all six methods; the tracked 5 score ≈0 everywhere (every method
+catches ≥4/5).
+
+**Findings.**
+
+1. **No fitting method finds an operating point — and it fails three
+   different ways, which is what an information ceiling looks like.** (a)
+   The logreg family false-flags 74–94% of test corrects at the deployed
+   5% point (the tails overlap); (b) GBM's scores are so polarized
+   (median corrects 0.034, confabs 0.0002) that the train-5th-percentile
+   threshold is 0.9994 and flags EVERYTHING (degenerate calibration);
+   (c) the wide MLP overfits 1,179 train rows × 30,720 dims and its
+   ranking degrades to 0.761. Tail overlap, miscalibration, and overfit —
+   three failure shapes, one missing thing: separability at the tails.
+2. **Fitting choices move AUROC by ±0.04 around the same band (0.81–0.85);
+   nothing approaches a usable threshold.** Best ranking: GBM 0.854. Best
+   deployed false-flag rate: 0.370 (mlp-concat, at detection 0.741 — the
+   ONLY method near the detection bar, and it false-flags 7× the budget).
+3. **Ranking stays pure under every fitter.** Bottom-10% purity 0.93–1.00;
+   tracked-5 score ≈0 for all six. The detection principle has now
+   survived 9 critic variants across 3 stages; the operating point has
+   failed all 9.
+4. **Calibration is not the missing piece.** The sigmoid-calibrated logreg
+   (0.828, FPR 0.739) lands in the same band as its uncalibrated parent
+   (0.821, FPR 0.761) — monotonic rescoring cannot un-overlap the tails.
+5. **Pre-registered decision: branch 1 fires.** All FAIL at AUROC ≈
+   0.83–0.86 (top cluster 0.821–0.854). **The information ceiling is in
+   the features, not the fitter. The signature-critic THRESHOLD line
+   closes.** Ranking-as-product (bottom-k review queue) becomes the critic
+   deliverable. Program moves to Stage 4 (memory/state persistence).
+
+Protocol amendments for compute (recorded for the audit trail): CV skipped
+for the three concat methods (no hyperparameters to select — the selection
+rule had nothing to decide); GBM trimmed to 150 trees/15 leaves and MLP
+capped at 300 epochs (training-time knobs; method families unchanged);
+CV parallelized (`n_jobs=-1`). The frozen method list, split, threshold,
+bar, and decision rule ran exactly as registered.
+
+**Artifacts.** `PREREG_STAGE3P6.md`, `fit_critic.py`,
+`stage3p6_fitted_results/` (`fit_report.json` + per-method JSONs). Runtime
+≈25 min CPU total.
+
+---
+# Stage 4 — memory/state persistence: exact save/load, weak recall, disposition blocks (2026-07-25)
+
+Pre-registered (`PREREG_STAGE4.md`): save the RWKV7-1.5B's recurrent state
+after a conversation, reload it in a fresh session, and test whether the
+model "wakes up with yesterday's gist". vast.ai instance 45773039 (RTX
+3090, same stack as Stage 3/3.5: transformers 4.56.2 + fla 0.5.1 + triton
+3.7.0, torch 2.12.0+cu130). Total session ~45 min, ~$0.50.
+
+**Teach/save.** Scripted 257-token transcript: 5 FABRICATED facts (a dog
+named Zorblax; codename Velvet Aurora; favorite number 7,423; a
+miniature-lighthouse collection; lab-door password "mango Tuesday"),
+assistant ACKs in the model's own grammar. The fla Cache captured: 24
+layers × {`recurrent_state` [1,32,64,64], `conv_state` [1,2048],
+`ffn_state` [1,2048]} → `gist_state.pt`, 12.8 MB. Cache internals checked
+(stage4_check2): nothing lives outside the per-layer state dicts
+(`layer0.keys/values = None`) — the state dict IS the complete memory.
+
+**Reload path.** Fresh Cache from a dummy warm-up forward; every layer's
+state dict overwritten from disk. First mechanical check FAILED (cosine
+0.9977, argmax flip) — then diagnosed as an artifact of MY check, not the
+reload: it compared a 257-token chunked prefill against an 8-token
+continuation, and bf16 chunk boundaries differ between those paths. The
+same-path control (feed the SAME 8-token tail through the original cache
+and the disk-reloaded cache): **cosine 1.00001, argmax match, top-5
+identical, top-2 logits equal to 3 decimals** (0.86328125 = 0.86328125);
+single-token decode path cosine 0.99973, argmax match. **The reload is
+EXACT.** (PREREG decision rule applied in-session: engineering iteration
+on the reload path; the frozen quiz bar never moved.)
+
+**Quiz (frozen bars).** Baseline (fresh model, no state): **0/5** — the
+fabricated facts are clean, the control works. Gist (reloaded state):
+**0/5** — FAIL vs the ≥4/5 bar. Every gist answer is an abstention loop:
+`<stop>unknown</stop> I have no information about that.`
+
+**The missing control (stage4_check3.py).** The LIVE cache — same session,
+no reload — also scores **0/5**. Live ≡ reloaded: whatever blocks recall
+is not the save/load machinery. Two probes isolate it:
+
+- **Primed content probe** (answer slot forced open with a prefix): 1/5 —
+  "mango Tuesday" IS retrieved verbatim from the state; but "collect"
+  confabulates "dinosaur bones" — forced slots retrieve-or-invent.
+- **QA-style teach** (facts written as question/ANSWER pairs instead of
+  declarations): 1/5 — "Velvet Aurora" retrieved. Write format moves
+  recall from 0/5 to 1/5 on different facts — the channel exists but is
+  noisy and format-sensitive.
+
+**Findings.**
+
+1. **State persistence is real and exact at 1.5B — mechanically (logits
+   identical to 3 decimals) and behaviorally (live ≡ reloaded, both
+   0/5).** Session continuity via state save/load WORKS.
+2. **Episodic FACT recall from state priming is weak (0–1/5 across
+   formats).** The state carries a usable distribution but is not a
+   reliable fact store at this scale. Content channel is nonzero
+   ("mango Tuesday", "Velvet Aurora" retrieved) but noisy.
+3. **The abstention disposition blocks the personal-question path —
+   live and reloaded alike.** "What is my dog's name?" is structurally a
+   personal-context question — generator class 5 of the true-boundary
+   mix, which the model was trained to refuse. The verify sense cannot
+   see the state's content as *knowledge*. Stage 4b's write-gate must
+   therefore negotiate the disposition: facts must be written in a form
+   the model counts as KNOWN, or the memory is refused on read.
+4. **Design consequence (validates paper §6.2's two-store split).** State
+   save/load is a CONTINUITY mechanism (the conversation's distribution
+   persists exactly); episodic FACT storage belongs in the retrieval
+   store (embeddings → context injection), not in raw state priming.
+
+**Decision (vs frozen bars): mech PASS; baseline control PASS (0/5); gist
+quiz FAIL (0/5).** Per the pre-registered decision rule ("mechanical
+passes, gist fails → the state carries a distribution but not usable
+content; record what IS preserved"): recorded — exact distributional
+persistence; a weak-but-nonzero content channel (2/15 retrieval events
+across formats); and a full disposition block on the personal-question
+path. Next: (a) write-gate design (Stage 4b) informed by the disposition
+finding; (b) the §6.2 retrieval-store episodic path as the fact-carrying
+store; (c) continuity-style persistence (conversation continuation) as
+the confirmed role of state save/load.
+
+**Artifacts.** `PREREG_STAGE4.md`, `stage4_gist.py`, `stage4_check2.py`
+(reload-exactness control), `stage4_check3.py` (live control + probes),
+`run_stage4.sh`, `stage4_results/` (`gist_state.pt` 12.8MB,
+`stage4_report.json`, `stage4_run2.out`, `stage4_check3.out`). Instance
+45773039 — all artifacts verified local 2026-07-25; safe to destroy.
+
+---
+# Stage 4b — write-gate formats + retrieval store: state-writing BEATS context injection (2026-07-25)
+
+Pre-registered (`PREREG_STAGE4B.md`) before any run. Two questions from
+Stage 4's findings: **(A)** is there a WRITE FORMAT the verify disposition
+counts as KNOWN (declarations were refused on read at 0/5)? **(B)** does
+the §6.2 retrieval-store path (embeddings → context injection) actually
+get the model to answer — or does the disposition refuse injected facts
+too? Same 5 fabricated facts, same hit rule (gold substring), same model
+(`eivintobias/heartly-rwkv7-1.5b`), same stack. vast.ai instance
+45799127 (RTX 3090), ~20 min GPU, <$0.50. One protocol deviation
+recorded: `accelerate` was missing from the pinned pip list — first
+launch crashed at model load; installed and rerun, nothing else changed.
+
+**Local gate (run before renting).** `memory_store.py` store = 5 fact
+memories + 15 fabricated distractors; MiniLM embeddings. Top-1 retrieval
+**5/5** — PASS (replicated 5/5 on the instance).
+
+**Part A — write-gate (frozen 6-format list):**
+
+| format | recall | note |
+|---|---|---|
+| W1 declarative + ACK (Stage-4 baseline) | 0/5 | replicates Stage 4 exactly |
+| W2 QA pairs | 1/5 | replicates Stage 4 (different fact retrieved: codename vs Stage 4's) |
+| W3 assistant-voice restatement | 1/5 | "mango Tuesday" retrieved |
+| W4 trivia-framing (personal Qs) | 0/5 | framing alone doesn't cross |
+| W4 trivia-framing (third-person Qs) | 1/5 | |
+| W5 QA pairs × 3 repetitions | 2/5 | repetition helps (1→2) |
+| **W6 combined (W3+W4+W2, 905 tokens)** | **4/5** | **PASSES the ≥4/5 bar** |
+
+W6's four hits are clean grammar-parseable answers ("The user asks a
+personal fact. I know this. I will speak. The answer is Zorblax."); the
+one miss (password) abstains. Monotonic trend: more write formats + more
+tokens = more recall (0 → 1 → 2 → 4). The disposition CAN be crossed by
+writing the same facts several ways — redundant multi-format writes act
+like a rehearsal buffer.
+
+**Part B — retrieval store → context injection (frozen 3-format list):**
+
+| injection | recall |
+|---|---|
+| I1 context prefix (`Context: {memory}`) | 1/5 |
+| I2 memory as prior QA turn | 2/5 |
+| I3 knowledge grant (`You know the following:`) | 1/5 |
+
+All ≤ 3/5 → **Part B FAILS the bar.** Retrieval itself was perfect (5/5
+top-1); the failure is generation-side: with the fact LITERALLY IN THE
+PROMPT the model still answers "I don't have that information" on most
+personal questions. I3's password answer is diagnostic: "The answer is
+Tuesday" — it read the context but reproduced it lossily. The model was
+never trained to treat context as knowledge (no SQuAD-style
+context+question rendering survived into the SFT mix — known-side was
+question-only), so injected text is scenery, not knowledge.
+
+**Findings.**
+
+1. **The pre-registered "surprising" branch fired: A passes, B fails.**
+   State-writing (W6, 4/5) beats context injection (best 2/5) — the
+   OPPOSITE of the §6.2 prediction. The state channel is real and
+   usable when the write is redundant and multi-format.
+2. **The disposition block is format-sensitive, not absolute.** Stage 4
+   said declarations get refused; Stage 4b shows the same facts written
+   three ways in one transcript get ANSWERED 4/5. The verify sense
+   counts a fact as known when it has seen itself speak it as known.
+3. **Context injection fails for a trainable reason.** The SFT mix has
+   no "answer from provided context" class — the model reads injected
+   context as noise. This is not a §6.2 refutation; it is a missing
+   TRAINING CLASS. Stage 4c candidate: add a context-known rendered
+   class (context + question → speak/known, grounded answer) to the
+   SFT mix; predicted to flip Part B.
+4. **Degraded grammar in long multi-turn continuations (new
+   observation).** Several outputs drift into `<stop>unknown</stop>`
+   loops and fused tokens (`<decide>verify</verify>`) — the SFT data is
+   single-turn, so multi-turn conversation is out-of-distribution.
+   Memory-relevant: any deployed memory path needs multi-turn training
+   data too.
+
+**Decision (vs frozen bars): A PASS (W6 4/5), B-local PASS (5/5),
+B-GPU FAIL (≤2/5).** Per the pre-registered rule: the winning write
+format (W6 redundant multi-format) becomes the write-gate design; the
+retrieval store's failure is diagnosed as a missing training class, so
+Stage 4c = add a context-known class to the SFT mix (plus multi-turn
+samples) and retrain — predicted to make BOTH channels work.
+
+**Artifacts.** `PREREG_STAGE4B.md`, `memory_store.py` (+ local gate
+`stage4b_store_gate.json`), `stage4b_write_gate.py`,
+`stage4b_retrieval.py`, `run_stage4b.sh`, `stage4b_results/`
+(write_gate_report.json, retrieval_report.json, both .out logs,
+stage4b.log). Instance 45799127 — all artifacts verified local
+2026-07-25; safe to destroy.
