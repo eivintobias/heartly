@@ -140,7 +140,7 @@ The full research paper is included in this repository (`RESEARCH_PAPER.md`). Ke
 
 ## License
 
-This project is released for research and educational purposes. The base model (Qwen2.5-0.5B) is subject to its own license terms.
+This project is licensed under the **Apache License 2.0** — see [LICENSE](LICENSE). You are free to use, modify, and build on this work (including commercially) with attribution. The base models (Qwen2.5-0.5B, RWKV7-Goose-World3-1.5B) are subject to their own license terms.
 
 ---
 
