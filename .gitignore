@@ -51,3 +51,4 @@ research_papers/_read_chat.py
 # Download chunk files (reassembled into model weights locally)
 *.part0*
 heartly-rnn/heartly-rnn-stage*.zip
+STARTUP_NOTES.md 
