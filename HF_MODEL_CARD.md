@@ -1,6 +1,6 @@
 ---
 language: en
-license: other
+license: apache-2.0
 library_name: transformers
 tags:
 - heartly
@@ -39,6 +39,17 @@ inference:
 ---
 
 # Heartly v2 — Research Prototype
+
+> ### 📌 This is Track 1 — the newer work lives on RWKV
+>
+> Heartly runs two tracks. This model is **Track 1** (Qwen2.5-0.5B), the first published artifact and the one whose *failures* are documented in detail below. **Track 2** went further on recurrent models and is where the project's actual results are:
+>
+> - **[heartly-rwkv7-1.5b-v2](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b-v2)** ← latest — RWKV7-1.5B, grammar 100%, decide accuracy 100%, boundary head AUROC 1.000, plus working memory channels
+> - **[heartly-rwkv7-1.5b](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b)** — the Stage 3 baseline
+>
+> This card stays up because the failure data is the contribution: it shows concretely that **control tokens alone don't work** — grammar is cheap, the training distribution is the mechanism. That lesson is what produced Track 2.
+>
+> **Code, full experiment record and papers:** https://github.com/eivintobias/heartly
 
 **⚠️ EARLY RESEARCH PROTOTYPE — NOT PRODUCTION READY ⚠️**
 
@@ -98,8 +109,8 @@ These are **instructive failures**: they demonstrate that special tokens alone a
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model = AutoModelForCausalLM.from_pretrained("Heartly/heartly-v2-qwen2.5-0.5b")
-tokenizer = AutoTokenizer.from_pretrained("Heartly/heartly-v2-qwen2.5-0.5b")
+model = AutoModelForCausalLM.from_pretrained("eivintobias/heartly-v2")
+tokenizer = AutoTokenizer.from_pretrained("eivintobias/heartly-v2")
 
 prompt = "User: What is the capital of France?\nAssistant: "
 inputs = tokenizer(prompt, return_tensors="pt")
@@ -109,7 +120,7 @@ print(tokenizer.decode(outputs[0]))
 
 ## Evaluation
 
-See the companion file `heartly_test_prompts.md` for 75 structured test prompts organized into three categories:
+See [`heartly_test_prompts.md`](https://github.com/eivintobias/heartly/blob/main/heartly_test_prompts.md) for 75 structured test prompts organized into three categories:
 - **Category A (30 prompts):** Known facts the model should answer correctly
 - **Category B (35 prompts):** Unknown facts where the model should abstain
 - **Category C (10 prompts):** Silence triggers where the model should output `<stop>`
@@ -121,6 +132,26 @@ This model accompanies the research paper *"Nature-First AI: Training Language M
 1. **Hallucination is a nature problem** — models are optimized to always produce plausible text, so they confabulate when they don't know.
 2. **Honesty requires a boundary** — a model can only reliably abstain when its knowledge boundary is explicit.
 3. **The dataset is the nature** — behavioral principles should be compiled *into* the supervised data, not only corrected after the fact.
+
+### What happened after this model
+
+The failures on this card motivated Track 2, which tested the same ideas on recurrent models where the internal state can be read directly. Headline results, all in [RESULTS.md](https://github.com/eivintobias/heartly/blob/main/heartly-rnn/RESULTS.md):
+
+- **Absence sensors work.** A ~2k-parameter logistic probe on RWKV recurrent state reads *known vs unknown* at **AUROC 1.000** — the model's knowledge boundary is linearly present in its own state.
+- **The grammar sticks at scale.** RWKV7-1.5B reaches **100% grammar adoption and 100% decide accuracy** — none of the `speakknown` token collapse seen here.
+- **But the sensor has a blind spot.** It shares state with the generator, so *confident* confabulation slips past. An independent critic detects it in principle, and the requirement was measured: **the critic must be stronger than the generator**.
+- **Memory needs training to read.** Injected context is invisible scenery unless the SFT mix contains an "answer from provided context" class — one training class flipped both memory channels open.
+- **Knowing ≠ being right.** Content accuracy at 1.5B is ~15% while decide accuracy is 99.8%. Knowing when to speak and being correct when you do are separate capabilities; Heartly only claims the first.
+
+## Links
+
+- **GitHub (code, full results, papers):** https://github.com/eivintobias/heartly
+- **Experiment record:** [`heartly-rnn/RESULTS.md`](https://github.com/eivintobias/heartly/blob/main/heartly-rnn/RESULTS.md)
+- **Program paper:** [`RESEARCH_PAPER_II_TRUE_BOUNDARY.md`](https://github.com/eivintobias/heartly/blob/main/research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md)
+- **Plain-language papers:** [`research_papers/plain/`](https://github.com/eivintobias/heartly/tree/main/research_papers/plain)
+- **Roadmap:** [Stage 5 pre-registration](https://github.com/eivintobias/heartly/blob/main/heartly-rnn/PREREG_STAGE5.md)
+- **Test suite used here:** [`heartly_test_prompts.md`](https://github.com/eivintobias/heartly/blob/main/heartly_test_prompts.md)
+- **Latest model:** [`eivintobias/heartly-rwkv7-1.5b-v2`](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b-v2)
 
 ## Citation
 
@@ -135,4 +166,4 @@ This model accompanies the research paper *"Nature-First AI: Training Language M
 
 ## License
 
-Research and educational purposes only. Base model (Qwen2.5-0.5B) terms apply.
+Apache License 2.0 — see [LICENSE](https://github.com/eivintobias/heartly/blob/main/LICENSE) in the repository. Base model (Qwen2.5-0.5B) is subject to its own license terms.
