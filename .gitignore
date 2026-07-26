@@ -16,6 +16,7 @@ __pycache__/
 .env
 venv/
 .venv/
+.venv-heartly/
 
 # OS files
 Thumbs.db
@@ -90,3 +91,7 @@ heartly-rnn/*.log
 
 # One-off upload scripts (may contain tokens in env)
 upload_hf_v2.py
+push_hf_cards.py
+
+# Live chat memory store (accumulates whatever is said to the model)
+heartly-rnn/memories.json
