@@ -28,8 +28,28 @@ New since v2: the project has a second research track — **boundary heads and i
   - **Stage 4 (2026-07-25):** memory — state save/load is **EXACT** (12.8MB state file, logits identical to 3 decimals, live ≡ reloaded), but episodic fact recall from raw state priming is weak (0–1/5) and the abstention disposition refuses personal-context questions even when the answer sits in the state
   - **Stage 4b (2026-07-25):** the write-gate OPENS — writing each fact multiple ways in one transcript reaches **4/5 recall** (single formats: 0–2/5); but retrieval-store context injection FAILS (1–2/5 despite perfect retrieval) — the SFT mix has no "answer from provided context" class, so injected context is scenery, not knowledge. Lesson: **a model can only use a memory channel it was trained to read.**
   - **Stage 4c (2026-07-25):** ALL BARS PASS — memory-aware SFT retrain on 7,531 samples (942 steps, ~34 min). No regression (grammar 300/300, say/sense 1.0, boundary head AUROC 1.0); write-gate ALL 7 formats **5/5** (W1 declarations were 0/5 before!); retrieval 5/5 + context injection I1 **4/5**, I2 **4/5**. One training class (context-known) flipped BOTH memory channels — the disposition block was a single learned gap. **§6.2 validated end-to-end.** Published: [eivintobias/heartly-rwkv7-1.5b-v2](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b-v2)
+  - **Stage 4d (2026-07-26):** the presentation layer — the Heartly grammar is *internal* machinery, and a chat UI should not show it. [`reply_formatter.py`](heartly-rnn/reply_formatter.py) parses a raw generation and surfaces only the answer zone: control tags, the think block, meta-commentary ("I know this fact"), duplicate refusals and truncated fragments are all stripped. Display-only — the model is untouched. Pre-reg: [PREREG_STAGE4D.md](heartly-rnn/PREREG_STAGE4D.md)
 - **[research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md](research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md)** — Research Paper II: the full program (boundary error, negative-side mechanisms, memory track)
 - **[research_papers/plain/](research_papers/plain/)** — plain-language copies of all papers
+
+---
+
+## 🗺️ Roadmap — what's next
+
+Every stage in this project is **pre-registered before it runs**: the hypothesis, the method, the pass/fail bar and the fallback branches get written down first, so a failure is a result rather than a reason to move the goalposts. The next one is already on paper.
+
+**[Stage 5 — Conversational SFT Data](heartly-rnn/PREREG_STAGE5.md)** (pre-registered, not started)
+
+Stage 4c proved the model knows *whether* to speak and *whether* it knows. Live chat then exposed a different problem: what it says inside the answer zone is stiff. Four issues, all traced to the training data rather than the grammar:
+
+1. **Quiz-stem phrasing** — the answer zone opens with "The answer is X" because the SFT mix was built from factual QA
+2. **No conversational class** — casual openers ("Hey, how's it going?") aren't questions, so the model emits `decide=stop` and says nothing
+3. **Refusal pile-up** — on unknowns it stacks three different refusal phrasings into one reply, sometimes contradicting an answer it just gave
+4. **No persona** — nothing in the data teaches warmth or turn-taking, so prompting for it has no effect
+
+The fix re-renders answer zones naturally and adds conversational + persona sample families, while the grammar and the Stage 4c memory classes stay exactly as they are. The pre-registration carries the regression guards that protect what already works.
+
+Also open: the **integrated memory demo** — write-gate + retrieval store in one live session, the paper's §6.2 architecture end-to-end.
 
 ---
 
@@ -118,11 +138,13 @@ These issues are **instructive failures**: they demonstrate that special tokens 
 ├── checkpoint-33500/                # v2 model scripts + test logs
 ├── heartly-v3/                      # v3 interrupted checkpoint + GGUF scripts
 ├── heartly-rnn/                     # Track 2 lab (RWKV experiments)
-│   ├── RESULTS.md                   # Full experiment record (Stages 1–4c)
+│   ├── RESULTS.md                   # Full experiment record (Stages 1–4d)
 │   ├── README.md                    # Track 2 overview
 │   ├── PREREG_STAGE4.md            # Stage 4 pre-registration
 │   ├── PREREG_STAGE4B.md           # Stage 4b pre-registration
 │   ├── PREREG_STAGE4C.md           # Stage 4c pre-registration
+│   ├── PREREG_STAGE4D.md           # Stage 4d pre-registration (reply formatting)
+│   ├── PREREG_STAGE5.md            # Stage 5 pre-registration (conversational SFT)
 │   ├── gen_probe_dataset.py        # True-boundary question generator
 │   ├── extract_states.py           # Recurrent state extraction
 │   ├── train_probe.py              # Boundary head training
@@ -141,6 +163,11 @@ These issues are **instructive failures**: they demonstrate that special tokens 
 │   ├── fit_critic.py               # Fitted critic experiments
 │   ├── pick_tracked.py             # Tracked-confabulation selection
 │   ├── smoke_rwkv7.py             # RWKV7 smoke test
+│   ├── reply_formatter.py          # Grammar parser → user-visible answer (Stage 4d)
+│   ├── test_reply_formatter.py     # Formatter unit tests
+│   ├── chat_memory.py              # Interactive chat + memory store + formatter
+│   ├── chat_v2.py                  # Interactive chat (plain, no memory)
+│   ├── run_test_prompts.py         # Batch-run the 75-prompt suite
 │   └── ...                         # Shell scripts, requirements, etc.
 ├── research_papers/
 │   ├── RESEARCH_PAPER.md           # Position paper (draft v0.2)
