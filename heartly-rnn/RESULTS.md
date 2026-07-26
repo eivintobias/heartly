@@ -846,3 +846,122 @@ samples) and retrain — predicted to make BOTH channels work.
 (write_gate_report.json, retrieval_report.json, both .out logs,
 stage4b.log). Instance 45799127 — all artifacts verified local
 2026-07-25; safe to destroy.
+
+---
+
+# Stage 4c — memory-aware SFT retrain: BOTH memory channels now work (2026-07-25)
+
+Pre-registered (`PREREG_STAGE4C.md`) before any run. Stage 4b left two
+diagnosed failures with predicted fixes, both in the SFT mix: (A) no
+"answer from provided context" class → context injection fails; (B) no
+multi-turn samples → grammar degrades in long continuations. Fix: extend
+the dataset (`render_sft_dataset_v2.py` → `sft_dataset_v2.jsonl`, 7,531
+samples = 4,248 known + 1,000 context-known from SQuAD + 2,033 unknown +
+250 silence + 500 multi-turn), retrain the 1.5B with the exact Stage-3
+recipe (2 epochs, 942 steps, bf16, 16/24 frozen), re-run the full
+Stage 4b battery + say/sense regression check. vast.ai instance
+45822205 (RTX 3090), ~2.5h wall (~34 min train + evals), ~$1.
+
+**Protocol deviations recorded (3, none affect results):** (1) first
+launch died on an HF xet-CDN 429 rate limit — fixed with
+`HF_HUB_DISABLE_XET=1`, plain download path; (2) `measure_say_sense.py`
+needed `--tokenizer-repo RWKV/RWKV7-Goose-World3-1.5B-HF` (the saved
+model dir has the tokenizer files but AutoTokenizer also wanted
+protobuf — installed) ; (3) `finetune_rwkv.py`'s save doesn't copy
+`modeling_rwkv7.py` into the output dir — copied from the HF cache
+(same night-scp class of bug as the Stage-3 HF upload).
+
+**Regression check (say/sense, 300 eval Qs) — NO REGRESSION:**
+
+| metric | Stage 3 (v1) | Stage 4c (v2) | bar |
+|---|---|---|---|
+| grammar parsed | 300/300 | **300/300** | ≥99% PASS |
+| say accuracy | 1.000 | **1.000** | ≥97% PASS |
+| sense accuracy | 1.000 | **1.000** | — |
+| say/sense agreement | 1.000 | **1.000** | — |
+| head AUROC (L6) | 1.000 | **1.000** | — |
+
+The two new classes (context-known + multi-turn) cost NOTHING on the
+base capabilities.
+
+**Part A — write-gate (same frozen 6-format list, new model):**
+
+| format | Stage 4b (v1) | Stage 4c (v2) |
+|---|---|---|
+| W1 declarative + ACK | 0/5 | **5/5** |
+| W2 QA pairs | 1/5 | **5/5** |
+| W3 assistant-voice | 1/5 | **5/5** |
+| W4 trivia (personal Qs) | 0/5 | **5/5** |
+| W4 trivia (third-person) | 1/5 | **5/5** |
+| W5 QA × 3 reps | 2/5 | **5/5** |
+| W6 combined | 4/5 | **5/5** |
+
+**ALL formats perfect.** The bar was only "W6 ≥4/5 again"; instead every
+single-format write now crosses the disposition — including W1 bare
+declarations, which were 0/5 in BOTH Stage 4 and Stage 4b. The
+context-known class generalized: the model now treats in-context facts
+as knowledge regardless of write format. The rehearsal-buffer trick
+(W6) is no longer necessary — one declarative write is enough.
+
+**Part B — retrieval store → context injection (same frozen 3 formats):**
+
+| injection | Stage 4b (v1) | Stage 4c (v2) | bar ≥4/5 |
+|---|---|---|---|
+| retrieval top-1 (MiniLM) | 5/5 | **5/5** | — |
+| I1 context prefix | 1/5 | **4/5** | **PASS** |
+| I2 memory as prior QA turn | 2/5 | **4/5** | **PASS** |
+| I3 knowledge grant | 1/5 | 3/5 | fail |
+
+**Part B PASSES** (bar: any single format ≥4/5; two formats hit it).
+The headline prediction fired: the missing-training-class diagnosis was
+correct, and the §6.2 retrieval-store path now works end-to-end
+(embed → retrieve 5/5 → inject → grounded answer). I1 answers read
+exactly as trained ("The provided context contains the answer. I will
+speak. The answer is Zorblax."). The misses are consistent and
+interpretable: "favorite number" fails in all 3 formats (numeric fact —
+likely tokenization/copy difficulty), and I3's "You know the following:"
+phrasing is furthest from the trained `Context:` format (3/5 — format
+proximity to training matters).
+
+**Multi-turn grammar (qualitative bar):** the Stage-4b
+`<stop>unknown</stop>` loops are GONE from the write-gate outputs. New
+cosmetic artifact: outputs often open with a spurious `<tool_call>`
+token before the reasoning (a chat-template token leaking from the
+base model's vocabulary — the grammar after it parses fine and the hit
+rule is unaffected). Recorded, not blocking; worth cleaning in a future
+data pass.
+
+**Findings.**
+
+1. **Both memory channels now work.** State-writing: every format 5/5.
+   Retrieval store: 5/5 retrieval × 4/5 grounded injection. The paper's
+   §6.2 architecture (facts in the retrieval store, state as the
+   working distribution) is now demonstrated end-to-end — and the state
+   channel works too.
+2. **One training class flipped both channels.** The context-known class
+   was aimed at Part B but also perfected Part A — evidence that the
+   Stage-4/4b "disposition block" was a single learned gap ("in-context
+   text is not knowledge"), not two separate problems. The model's
+   knowledge concept was question-only; 1,000 SQuAD-rendered samples
+   widened it to context.
+3. **Dispositions are trainable without damage.** The abstention
+   disposition survived intact (unknown facts still refused — "favorite
+   number" misses show the model abstaining, not confabulating, when
+   the copy fails; say/sense still 1.0/1.0). Teaching "context is
+   knowledge" did not teach "everything is knowledge."
+4. **The multi-turn class fixed the continuation degradation** observed
+   in Stage 4b. Long transcripts (W5 819 tokens, W6 950 tokens) now
+   produce clean grammar per turn.
+
+**Decision (vs frozen rule): B passes → the retrieval store is the
+episodic memory channel (§6.2 validated); both memory paths work.**
+Next per pre-reg: integrated memory demo (write-gate + retrieval store
+in one session) and paper §7A update.
+
+**Artifacts.** `PREREG_STAGE4C.md`, `render_sft_dataset_v2.py`,
+`sft_dataset_v2.jsonl` (7,531), `stage4c_write_gate.py`,
+`stage4c_retrieval.py`, `run_stage4c.sh`, `stage4c_results/`
+(say_sense_report_v2.json, probe_head_v2.pkl, write_gate_report.json,
+retrieval_report.json, both .out logs, stage4c.log), model
+`rwkv7-heartly-v2/` (3GB bf16, pulled home chunked). Instance
+45822205 — destroy after model download verified.

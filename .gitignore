@@ -51,4 +51,39 @@ research_papers/_read_chat.py
 # Download chunk files (reassembled into model weights locally)
 *.part0*
 heartly-rnn/heartly-rnn-stage*.zip
-STARTUP_NOTES.md 
+STARTUP_NOTES.md
+
+# Internal handoff doc (not for public repo)
+HANDOFF.md
+
+# Model download scripts with SSH key paths (security)
+heartly-rnn/pull_stage4c_model.ps1
+
+# Model weight directories (too large for GitHub — on Hugging Face)
+heartly-rnn/rwkv7-heartly-v2/
+heartly-rnn/stage2_results/
+heartly-rnn/stage2p5_results/
+heartly-rnn/stage2p5_asym3_results/
+heartly-rnn/stage2p5_asym15_results/
+heartly-rnn/stage2p5_smoke/
+heartly-rnn/stage3_results/
+heartly-rnn/stage3_critic_results/
+heartly-rnn/stage3_critic_asym3_results/
+heartly-rnn/stage3_critic_asym15_results/
+heartly-rnn/stage3p6_fitted_results/
+heartly-rnn/stage4_results/
+heartly-rnn/stage4b_results/
+heartly-rnn/stage4c_results/
+heartly-rnn/states/
+heartly-rnn/rwkv-smoke/
+
+# Large data files (on Hugging Face or local only)
+heartly-rnn/critic_data_rwkv7_final.jsonl
+heartly-rnn/critic_data_rwkv7.jsonl
+heartly-rnn/critic_data.jsonl
+heartly-rnn/sft_dataset_v2.jsonl
+heartly-rnn/sft_dataset.jsonl
+heartly-rnn/probe_questions.jsonl
+
+# Log files
+heartly-rnn/*.log

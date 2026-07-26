@@ -277,6 +277,45 @@ far: **the model can only use a memory channel it was trained to
 read.** Which fits the project's oldest theme perfectly — everything
 is a data-distribution decision.
 
+**Stage 4c — we added the missing lesson, and BOTH doors flew open.**
+The plan from Stage 4b, executed: we added ~1,000 new training
+examples of "here's a paragraph of context, answer FROM it" (built
+from SQuAD) and ~500 multi-turn conversations, then retrained the
+model with the exact same recipe (about 34 minutes, ~$1). Then we
+re-ran the exact same tests that failed the day before.
+
+Three results, all good:
+
+*First — nothing broke.* The core honesty behavior is identical:
+grammar perfect (300/300), speak/abstain decisions perfect, the
+boundary sensor still reads AUROC 1.0. Adding the new lessons cost
+nothing.
+
+*Second — the state door didn't just open, it fell off its hinges.*
+Every single one of the 6 write formats now recalls **5 out of 5
+facts** — including plain statements, which scored 0/5 twice before.
+You no longer need the "say it three ways" rehearsal trick. Tell the
+model a fact once, plainly, and it counts as known.
+
+*Third — the memory bank works end to end.* Search still perfect
+(5/5), and now when the found memory is put in the prompt, the model
+answers from it: 4/5 in the two formats closest to how we trained it.
+The full pipeline — store memories, search them, inject the right
+one, get a grounded answer — works.
+
+The surprise bonus: the context lesson was aimed at the memory bank
+(Door B), but it fixed Door A too. That tells us the two "problems"
+were really ONE missing idea in the model's head: "text I can see
+right now counts as knowledge." One thousand examples taught it that
+idea, and both doors opened.
+
+And the best part for the project's philosophy: the honesty survived.
+The one fact the model keeps missing (the favorite NUMBER — numbers
+are hard to copy) it now says "I don't know" about, instead of making
+something up. We taught it "context is knowledge" without accidentally
+teaching it "everything is knowledge." The boundary moved exactly
+where we pointed it, and nowhere else.
+
 ## The one-line summary of the whole program
 
 Honesty isn't a rule you bolt onto a model — it's built from three things:
