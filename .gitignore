@@ -87,3 +87,6 @@ heartly-rnn/probe_questions.jsonl
 
 # Log files
 heartly-rnn/*.log
+
+# One-off upload scripts (may contain tokens in env)
+upload_hf_v2.py
