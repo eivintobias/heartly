@@ -5,7 +5,8 @@
 **Model weights:**
 - [🤗 heartly-v2 — Qwen2.5-0.5B, GGUF (Track 1)](https://huggingface.co/eivintobias/heartly-v2)
 - [🤗 heartly-rwkv7-1.5b — RWKV7-1.5B + boundary head (Track 2, Stage 3)](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b)
-- [🤗 heartly-rwkv7-1.5b-v2 — RWKV7-1.5B + memory (Track 2, Stage 4c)](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b-v2) ← **latest**
+- [🤗 heartly-rwkv7-1.5b-v2 — RWKV7-1.5B + memory (Track 2, Stage 4c)](https://huggingface.co/eivintobias/heartly-rwkv7-1.5b-v2)
+- [🤗 heartly-qwen-code — Qwen2.5-Coder-1.5B + Heartly grammar + critic (Track 3)](https://huggingface.co/eivintobias/heartly-qwen-code) ← **newest**
 
 Heartly is an experimental small language model project that explores a novel approach to reducing hallucination: instead of training a model to *always answer*, we train it to **decide whether to speak**, **verify what it knows**, and **admit ignorance honestly**.
 
@@ -31,6 +32,18 @@ New since v2: the project has a second research track — **boundary heads and i
   - **Stage 4d (2026-07-26):** the presentation layer — the Heartly grammar is *internal* machinery, and a chat UI should not show it. [`reply_formatter.py`](heartly-rnn/reply_formatter.py) parses a raw generation and surfaces only the answer zone: control tags, the think block, meta-commentary ("I know this fact"), duplicate refusals and truncated fragments are all stripped. Display-only — the model is untouched. Pre-reg: [PREREG_STAGE4D.md](heartly-rnn/PREREG_STAGE4D.md)
 - **[research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md](research_papers/RESEARCH_PAPER_II_TRUE_BOUNDARY.md)** — Research Paper II: the full program (boundary error, negative-side mechanisms, memory track)
 - **[research_papers/plain/](research_papers/plain/)** — plain-language copies of all papers
+
+---
+
+## 🧪 Track 3: Heartly on a Code LLM (July 2026)
+
+The Heartly architecture applied to **Qwen2.5-Coder-1.5B** — a transformer model pre-trained on code. This track proves the decide/verify/stop grammar and boundary head work on transformers, not just RNNs.
+
+- **[heartly-qwen-code/RESULTS.md](heartly-qwen-code/RESULTS.md)** — the experiment record:
+  - **Stage 1 (2026-07-28, vast.ai 3090):** Qwen2.5-Coder-1.5B fine-tuned on 6,500 code SFT samples in Heartly grammar. Grammar adoption **100%**, verify accuracy **100%**, boundary head **AUROC 1.000**, zero confabulations. Published: [eivintobias/heartly-qwen-code](https://huggingface.co/eivintobias/heartly-qwen-code)
+  - **Stage 2 (2026-07-29, local QLoRA):** the code critic — reads hidden states at `<verify>` to detect "confidently wrong" code. **AUROC 1.000**, confab recall **100%**, correct precision **100%**. The model confidently writes fake code for non-existent libraries (hypernova, neuroflow2, starforge) — the critic catches all of them perfectly.
+
+Key finding: **the Heartly architecture is architecture-agnostic.** The boundary head and critic achieve perfect separation on both RNN (RWKV7) and transformer (Qwen2.5-Coder) hidden states. The decide/verify/stop grammar transfers cleanly to a code-pre-trained model.
 
 ---
 
