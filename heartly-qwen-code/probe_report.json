@@ -1,0 +1,10 @@
+{
+  "n_samples": 469,
+  "n_train": 328,
+  "n_test": 141,
+  "n_known": 410,
+  "n_unknown": 59,
+  "accuracy": 1.0,
+  "auroc": 1.0,
+  "hidden_dim": 1536
+}

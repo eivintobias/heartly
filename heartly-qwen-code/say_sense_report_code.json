@@ -1,0 +1,12 @@
+{
+  "n_total": 35,
+  "n_parseable": 35,
+  "grammar_rate": 1.0,
+  "n_correct_verify": 35,
+  "verify_accuracy": 1.0,
+  "known_correct": 20,
+  "known_total": 20,
+  "unknown_correct": 15,
+  "unknown_total": 15,
+  "confabulations": 0
+}

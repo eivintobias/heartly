@@ -1,0 +1,11 @@
+{
+  "n_total": 40,
+  "n_labeled": 36,
+  "n_correct": 25,
+  "n_confab": 11,
+  "n_train": 25,
+  "n_test": 11,
+  "accuracy": 0.8181818181818182,
+  "auroc": 1.0,
+  "hidden_dim": 1536
+}
