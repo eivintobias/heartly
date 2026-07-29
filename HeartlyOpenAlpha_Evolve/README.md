@@ -163,9 +163,15 @@ Copy the example and fill in your values:
 cp .env.example .env
 ```
 
-#### Using the Local Heartly Model
+#### Using the Local Heartly Model (Default)
 
-To use the Heartly-Qwen-Coder model instead of external APIs:
+By default, HeartlyOpenAlpha_Evolve uses the local Heartly-Qwen-Coder model. The default configuration in `.env` points to the model at:
+
+```
+c:/Users/eivin/Desktop/latest Datasets organizer/Datasets organizer/Datasets organizer/heartly-qwen-code/heartly-qwen-code-lora
+```
+
+If you need to adjust the path or parameters, edit your `.env` file:
 
 ```bash
 USE_LOCAL_MODEL=True
@@ -185,7 +191,7 @@ BOUNDARY_HEAD_THRESHOLD=0.5
 
 #### Using External LLMs (LiteLLM)
 
-Set `USE_LOCAL_MODEL=False` and configure your API keys:
+To use external LLM APIs instead of the local model, set `USE_LOCAL_MODEL=False` and configure your API keys:
 
 ```bash
 USE_LOCAL_MODEL=False

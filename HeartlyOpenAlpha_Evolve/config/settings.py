@@ -29,8 +29,9 @@ LLM_PRIMARY_MODEL = os.getenv("LLM_PRIMARY_MODEL", LITELLM_DEFAULT_MODEL)
 LLM_SECONDARY_MODEL = os.getenv("LLM_SECONDARY_MODEL", FLASH_MODEL if FLASH_MODEL else LLM_PRIMARY_MODEL)
 
 # Local Heartly Model Configuration
-USE_LOCAL_MODEL = os.getenv("USE_LOCAL_MODEL", "False").lower() == "true"
-LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH", "heartly-qwen-code")
+# Defaults to using the local Heartly-Qwen-Coder model (LoRA adapter)
+USE_LOCAL_MODEL = os.getenv("USE_LOCAL_MODEL", "True").lower() == "true"
+LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH", "c:/Users/eivin/Desktop/latest Datasets organizer/Datasets organizer/Datasets organizer/heartly-qwen-code/heartly-qwen-code-lora")
 LOCAL_MODEL_DEVICE = os.getenv("LOCAL_MODEL_DEVICE", "auto")
 LOCAL_MODEL_DTYPE = os.getenv("LOCAL_MODEL_DTYPE", "fp16")
 LOCAL_MODEL_MAX_TOKENS = int(os.getenv("LOCAL_MODEL_MAX_TOKENS", "512"))
