@@ -1,0 +1,51 @@
+# Core Libraries
+litellm
+python-dotenv>=1.0.0
+PyYAML>=6.0.1
+tiktoken
+openai
+anthropic
+google-generativeai
+gradio[mcp]>=5.28.0
+mcp>=1.9.0
+docker
+Jinja2
+pydantic
+watchdog
+termcolor
+requests
+typing-extensions
+
+# LLM Models & Frameworks
+transformers>=4.38.0
+torch>=2.0.0
+accelerate>=0.25.0
+bitsandbytes>=0.43.0  # For quantization if needed
+sentencepiece>=0.1.99
+peft>=0.8.0  # For QLoRA adapter loading
+scikit-learn>=1.3.0  # For boundary head probe
+
+# Evolutionary Algorithms / RL
+# deap
+# pygad
+# ray[rllib]
+# stable-baselines3
+
+# Evaluation & Sandboxing
+pytest
+# hypothesis
+# e2b-sdk  # For E2B sandbox
+
+# Data Storage
+# psycopg2-binary  # For PostgreSQL
+# pymongo  # For MongoDB
+# dvc
+
+# Utilities
+# jinja2
+
+# API/Web (Optional, if exposing functionality)
+# fastapi
+# uvicorn
+
+# For potential future use or specific agent needs (example)
