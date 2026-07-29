@@ -30,8 +30,9 @@ LLM_SECONDARY_MODEL = os.getenv("LLM_SECONDARY_MODEL", FLASH_MODEL if FLASH_MODE
 
 # Local Heartly Model Configuration
 # Defaults to using the local Heartly-Qwen-Coder model (LoRA adapter)
+# The model lives in the heartly-qwen-code/ subdirectory of the project
 USE_LOCAL_MODEL = os.getenv("USE_LOCAL_MODEL", "True").lower() == "true"
-LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH", "c:/Users/eivin/Desktop/latest Datasets organizer/Datasets organizer/Datasets organizer/heartly-qwen-code/heartly-qwen-code-lora")
+LOCAL_MODEL_PATH = os.getenv("LOCAL_MODEL_PATH", "heartly-qwen-code/heartly-qwen-code-lora")
 LOCAL_MODEL_DEVICE = os.getenv("LOCAL_MODEL_DEVICE", "auto")
 LOCAL_MODEL_DTYPE = os.getenv("LOCAL_MODEL_DTYPE", "fp16")
 LOCAL_MODEL_MAX_TOKENS = int(os.getenv("LOCAL_MODEL_MAX_TOKENS", "512"))
@@ -42,7 +43,7 @@ LOCAL_MODEL_TOP_K = os.getenv("LOCAL_MODEL_TOP_K", None)
 
 # Boundary Head (optional quality gate)
 USE_BOUNDARY_HEAD = os.getenv("USE_BOUNDARY_HEAD", "False").lower() == "true"
-BOUNDARY_HEAD_PATH = os.getenv("BOUNDARY_HEAD_PATH", "probe_head.pkl")
+BOUNDARY_HEAD_PATH = os.getenv("BOUNDARY_HEAD_PATH", "heartly-qwen-code/critic_head.pkl")
 BOUNDARY_HEAD_THRESHOLD = float(os.getenv("BOUNDARY_HEAD_THRESHOLD", "0.5"))
 
 # if not PRO_API_KEY:
@@ -112,5 +113,3 @@ def get_llm_model(model_type="default"):
         return FLASH_MODEL if FLASH_MODEL else LITELLM_DEFAULT_MODEL # Return default if FLASH_MODEL is not set
     # Fallback for any other model_type not explicitly handled
     return LITELLM_DEFAULT_MODEL
-
-                                 
