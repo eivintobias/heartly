@@ -80,13 +80,50 @@ class CodeGeneratorAgent(CodeGeneratorInterface):
 
                 # Build the prompt, adding encouragement on retries
                 retry_prompt = prompt + retry_encouragements[retry_attempt]
-                heartly_prompt = heartly_parser.format_prompt(retry_prompt)
 
-                # If output_format is "diff", the diff instructions were already appended
-                # to the prompt above. The Heartly model doesn't do diffs natively, so
-                # we fall back to returning the diff text as-is (it was part of the prompt).
+                # If output_format is "diff", append diff format instructions to the prompt
+                # so the Heartly model knows to produce SEARCH/REPLACE blocks
                 if output_format == "diff":
-                    logger.warning("Heartly model does not support diff output format natively")
+                    retry_prompt += '''
+
+I need you to provide your changes as a sequence of diff blocks in the following format:
+
+<<<<<<< SEARCH
+# Original code block to be found and replaced (COPY EXACTLY from original)
+=======
+# New code block to replace the original
+>>>>>>> REPLACE
+
+IMPORTANT DIFF GUIDELINES:
+1. The SEARCH block MUST be an EXACT copy of code from the original - match whitespace, indentation, and line breaks precisely
+2. Each SEARCH block should be large enough (3-5 lines minimum) to uniquely identify where the change should be made
+3. Include context around the specific line(s) you want to change
+4. Make multiple separate diff blocks if you need to change different parts of the code
+5. For each diff, the SEARCH and REPLACE blocks must be complete, valid code segments
+6. Pay special attention to matching the exact original indentation of the code in your SEARCH block, as this is crucial for correct application in environments sensitive to indentation (like Python).
+
+Example of a good diff:
+<<<<<<< SEARCH
+def calculate_sum(numbers):
+    result = 0
+    for num in numbers:
+        result += num
+    return result
+=======
+def calculate_sum(numbers):
+    if not numbers:
+        return 0
+    result = 0
+    for num in numbers:
+        result += num
+    return result
+>>>>>>> REPLACE
+
+Make sure your diff can be applied correctly!
+'''
+                    logger.info("Appended diff format instructions to Heartly model prompt")
+
+                heartly_prompt = heartly_parser.format_prompt(retry_prompt)
 
                 # Generate with the local model
                 # Increase temperature slightly on retries to encourage different output
