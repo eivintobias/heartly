@@ -33,7 +33,7 @@ class ChatRequest(BaseModel):
 class _State:
     model: Optional[object] = None
     tokenizer: Optional[object] = None
-    model_name: str = os.environ.get("HEARTLY_MODEL", "heartly-qwen-code-v3")
+    model_name: str = os.environ.get("HEARTLY_MODEL", "eivintobias/heartly-qwen-code")
     lock: threading.Lock = threading.Lock()
 
 
@@ -120,7 +120,7 @@ async def chat(req: ChatRequest):
 
 def main():
     p = argparse.ArgumentParser(description="Heartly Qwen-Code v3 HTTP server")
-    p.add_argument("--model", default=os.environ.get("HEARTLY_MODEL", "heartly-qwen-code-v3"))
+    p.add_argument("--model", default=os.environ.get("HEARTLY_MODEL", "eivintobias/heartly-qwen-code"))
     p.add_argument("--host", default="127.0.0.1")
     p.add_argument("--port", type=int, default=8000)
     a = p.parse_args()

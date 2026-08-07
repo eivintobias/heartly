@@ -46,21 +46,21 @@ runs every reply through **`reply_formatter.py`**, which canonicalises the tags
 and returns only the clean answer.
 
 ```bash
-pip install -r heartly-qwen-code/requirements.txt   # includes fastapi + uvicorn
-python heartly-qwen-code/server.py --model heartly-qwen-code-v3 --port 8000
+pip install -r requirements.txt   # fastapi + uvicorn + transformers + torch
+python server.py --model eivintobias/heartly-qwen-code --port 8000
 
 curl -X POST http://127.0.0.1:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"prompt":"Write a function that reverses a string"}'
 ```
 
-Response: `{"model":"heartly-qwen-code-v3","raw":"...<decide>...","reply":"<clean answer>"}`.
+Response: `{"model":"eivintobias/heartly-qwen-code","raw":"...<decide>...","reply":"<clean answer>"}`.
 
 Quick browser test (no curl): open `http://127.0.0.1:8000/` — `server.py` serves an
 HTML chat UI at `GET /`. The first message lazy-loads the model; code answers render
 with real line breaks, and the Heartly grammar is stripped by the reply formatter.
 
-Quick offline test (no server): `python heartly-qwen-code/chat_smoke.py "Write a function that sorts a list"`.
+Quick offline test (no server): `python chat_smoke.py "Write a function that sorts a list"`.
 
 📦 **Model card source:** this file (`HF_MODEL_CARD_v3.md`). When uploaded to
 HuggingFace, copy it to `README.md` on the hub repo.
@@ -69,9 +69,9 @@ HuggingFace, copy it to `README.md` on the hub repo.
 ```python
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
-tok = AutoTokenizer.from_pretrained("eivintobias/heartly-qwen-code-v3")
+tok = AutoTokenizer.from_pretrained("eivintobias/heartly-qwen-code")
 model = AutoModelForCausalLM.from_pretrained(
-    "eivintobias/heartly-qwen-code-v3", torch_dtype=torch.float32, device_map="cpu"
+    "eivintobias/heartly-qwen-code", torch_dtype=torch.float32, device_map="cpu"
 )
 model.eval()
 ids = tok.encode("User: Write a function that reverses a string\nAssistant: ", return_tensors="pt")
@@ -82,6 +82,8 @@ from reply_formatter import format_reply
 print(format_reply(raw))
 ```
 
+> `reply_formatter.py` (grammar strip) and `server.py` are bundled in this repo (HF clone = flat layout; GitHub = `heartly-qwen-code/`). Clone it so `from reply_formatter import format_reply` resolves before the offline example.
+
 ## Files in this repo
 
 | File | Description |
@@ -91,6 +93,10 @@ print(format_reply(raw))
 | `chat_template.jinja` | standard Qwen chat template |
 | `tokenizer.json` / `tokenizer_config.json` | Qwen BPE tokenizer |
 | `model.safetensors` | v3 fine-tuned weights (**full fine-tune**, not a LoRA adapter) |
+| `server.py` | FastAPI server: lazy-loads the model; serves `/`, `/health`, `/chat`; strips Heartly grammar via reply_formatter |
+| `reply_formatter.py` | strips `thinking` / `<decide>` / `<verify>` / `<stop>` -> clean answer; unescapes code newlines |
+| `chat_smoke.py` | offline load + chat smoke test (no server) |
+| `requirements.txt` | torch, transformers, fastapi, uvicorn, sentencepiece, datasets, scikit-learn, numpy, accelerate, huggingface_hub |
 
 ## Training
 
