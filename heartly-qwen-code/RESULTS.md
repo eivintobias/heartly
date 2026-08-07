@@ -147,3 +147,24 @@ serving 1 T params needs a multi-GPU vLLM shard (~$36–72/hr); the local
 `server.py`/llama-cpp path only fits the v3 1.5B GGUF. Open gates: exact HF repo
 id + fine-distributable license, dense vs MoE, and tokenizer overlap with
 Heartly markup.
+
+
+## Final live verification (2026-08-07)
+
+Re-spawned a fresh server (old pid 8604 killed so it served the updated
+`reply_formatter.py`); `heartly-qwen-code-v3` loaded in ~4 s.
+
+- `GET /health` -> `{"status":"ready","model":"heartly-qwen-code-v3"}`.
+- `GET /` -> HTTP 200 with the chat UI; the `Send` button has no static `disabled`
+  attribute and CSS `white-space:pre-wrap` preserves newlines (UI fix confirmed).
+- `POST /chat` code-rendering probe -- all 3 code prompts green:
+  `real_newlines=True, backslash_n_left=False`. Fenced `python` blocks render multi-line
+  with real line breaks -- the original one-line collapse is resolved in both the
+  grammar-stripping path and the browser UI.
+- HuggingFace (public): https://huggingface.co/eivintobias/heartly-qwen-code -- 8 files
+  at root (config.json, generation_config.json, tokenizer.json, tokenizer_config.json,
+  chat_template.jinja, model.safetensors 2.94 GB, README.md, .gitattributes);
+  `private=false`, `used_storage ~ 2.96 GB`, commits `034d0c4` (config/tokenizer),
+  `51098a1` (weights), `a60fa7a` (model-card README).
+- GitHub: commit `4fb6412` pushed to github.com/eivintobias/heartly (master); the 2.94 GB
+  weights stay git-ignored -- only code + docs are committed (16 files).
