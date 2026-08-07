@@ -116,6 +116,24 @@ displayed output only — the model is untouched. Code-block indentation is
 preserved; empty-answer zones fall back to `…`; explicit "the answer is X"
 stems are salvaged rather than silenced. Regression tests lock the edge cases.
 
+## Stage 5 — Conversational serving
+
+**Status:** COMPLETE (2026-08-07). `server.py` (FastAPI) serves the v3 model at
+`http://127.0.0.1:8000/`, including a browser chat UI at `GET /`. `/chat` loads the
+weights lazily on the first request, then routes the raw Heartly grammar through
+`reply_formatter.format_reply(raw, mode='chat')`.
+
+- **Grammar strip:** removes `thinking` blocks and `<decide>/<verify>/<stop>` plus
+  mangled tag fragments — only the clean answer reaches the UI.
+- **Code-rendering fix:** the model emits in-code newlines as escaped text;
+  `_clean_text` unescapes them inside fenced code blocks, so code renders multi-line
+  instead of collapsing to one string.
+- **UI fix:** the chat `Send` button shipped `disabled` (permanent deadlock); the
+  attribute was removed and the button toggles only while streaming.
+- **Verified:** `GET /` returns the chat UI (HTTP 200); `POST /chat` with prompt
+  `What is 2+2?` returns `2 + 2 = 4`; a code prompt returns a fenced, multi-line block.
+- **Serving footprint:** CPU-only; 1.5 B params need no GPU for inference.
+
 ## Phase 2 — Trillion-parameter scaling (Kimi k1.6) 📋
 
 **Status:** PLANNED (see `ROADMAP.md` "NEW OPTION E").

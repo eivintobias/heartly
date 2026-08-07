@@ -99,6 +99,18 @@ python server.py --model heartly-qwen-code-v3 --port 8000
 # custom model:  python server.py --model <path-or-hf-repo> --port 8000
 ```
 
+### Chat in the browser
+
+Open `http://127.0.0.1:8000/` in any browser — `server.py` serves a full chat UI at
+`GET /` (no curl needed). The **Send** button is enabled by default and only
+disables briefly while a reply is streaming, then re-enables automatically. The
+model loads lazily on your first message (about 10-30 s warm-up on CPU), then
+replies instantly.
+
+Code answers render with real line breaks: `reply_formatter.py` restores the
+newlines the model emits as escaped text (a known decoding quirk) and strips the
+`<decide>/<verify>/<stop>` grammar so only the clean answer appears (see RESULTS.md).
+
 ### Chat over HTTP
 ```bash
 # health check (instant — model loads lazily on first /chat)

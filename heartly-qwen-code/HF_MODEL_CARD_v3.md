@@ -56,6 +56,10 @@ curl -X POST http://127.0.0.1:8000/chat \
 
 Response: `{"model":"heartly-qwen-code-v3","raw":"...<decide>...","reply":"<clean answer>"}`.
 
+Quick browser test (no curl): open `http://127.0.0.1:8000/` — `server.py` serves an
+HTML chat UI at `GET /`. The first message lazy-loads the model; code answers render
+with real line breaks, and the Heartly grammar is stripped by the reply formatter.
+
 Quick offline test (no server): `python heartly-qwen-code/chat_smoke.py "Write a function that sorts a list"`.
 
 📦 **Model card source:** this file (`HF_MODEL_CARD_v3.md`). When uploaded to
