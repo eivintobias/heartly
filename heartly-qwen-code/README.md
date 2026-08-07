@@ -81,3 +81,44 @@ Each sample is in `{instruction, output}` format with the Heartly grammar.
 ## License
 
 MIT
+
+---
+
+## Stage 5 — Serving Heartly Qwen-Code v3
+
+The v3 model (`heartly-qwen-code-v3/`) ships as a full fine-tune on
+`Qwen2.5-Coder-1.5B` with the conversational Stage-5 SFT recipe. It is served via
+a small **FastAPI `server.py`** that loads the weights and routes output through
+`reply_formatter.py`, so the `<decide>/<verify>/<stop>` grammar never reaches the
+user.
+
+### Run the server
+```bash
+pip install -r requirements.txt        # adds fastapi + uvicorn
+python server.py --model heartly-qwen-code-v3 --port 8000
+# custom model:  python server.py --model <path-or-hf-repo> --port 8000
+```
+
+### Chat over HTTP
+```bash
+# health check (instant — model loads lazily on first /chat)
+curl -s http://127.0.0.1:8000/health
+# chat
+curl -X POST http://127.0.0.1:8000/chat \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Write a function that sorts a list"}'
+```
+`/chat` returns JSON: `{"model":"heartly-qwen-code-v3","raw":"...grammar...","reply":"<clean answer>"}`.
+
+### Quick offline test (no server)
+```bash
+python chat_smoke.py "Write a function that reverses a list"
+# or pipe:  echo "your question" | python chat_smoke.py
+```
+
+### Notes
+- The `<decide>/<verify>/<stop>` tags are ordinary multi-token text (not tokenizer
+  special tokens), so they can decode mangled through some GUI front-ends. The
+  server's `reply_formatter` canonicalises and strips them — prefer `/chat`.
+- `model.safetensors` (3 GB) is git-ignored; weights live on HuggingFace, not
+  GitHub. See `HF_MODEL_CARD_v3.md`.

@@ -101,3 +101,31 @@ The critic achieves **perfect AUROC** — it can distinguish correct code from c
 ## Stage 4 — Conversational Code Chat (future)
 
 ## Stage 5 — Publish on HuggingFace (future)
+
+---
+
+## Stage 4d — Reply Formatter (display layer) ✅
+
+**Status:** COMPLETE (2026-08-07).
+
+`heartly-qwen-code/reply_formatter.py` + `test_reply_formatter.py` = **15/15
+green** (`py_compile` OK; `ResourceWarning` squashed). The formatter strips
+`<decide>/<verify>/<stop>` grammar tags, `thinking` blocks, duplicate refusals,
+and truncated/mangled token fragments (`<deside>`, unclosed `<stop>`) from the
+displayed output only — the model is untouched. Code-block indentation is
+preserved; empty-answer zones fall back to `…`; explicit "the answer is X"
+stems are salvaged rather than silenced. Regression tests lock the edge cases.
+
+## Phase 2 — Trillion-parameter scaling (Kimi k1.6) 📋
+
+**Status:** PLANNED (see `ROADMAP.md` "NEW OPTION E").
+
+Scaling Heartly to ~1 T params via Moonshot's open Kimi k1.6 instead of
+incrementally up the 1.5B→14B ladder. The Stage-5 SFT recipe transfers unchanged
+(`finetune_qwen.py` uses HF `AutoModelForCausalLM`/`AutoTokenizer` → the
+architecture is auto-resolved from the Kimi config). Recommended staging:
+**QLoRA r16/nf4** (~26 M trainable params, 4–8×B200) — train ~$35–90 (spot);
+serving 1 T params needs a multi-GPU vLLM shard (~$36–72/hr); the local
+`server.py`/llama-cpp path only fits the v3 1.5B GGUF. Open gates: exact HF repo
+id + fine-distributable license, dense vs MoE, and tokenizer overlap with
+Heartly markup.
