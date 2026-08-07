@@ -101,3 +101,70 @@ The critic achieves **perfect AUROC** — it can distinguish correct code from c
 ## Stage 4 — Conversational Code Chat (future)
 
 ## Stage 5 — Publish on HuggingFace (future)
+
+---
+
+## Stage 4d — Reply Formatter (display layer) ✅
+
+**Status:** COMPLETE (2026-08-07).
+
+`heartly-qwen-code/reply_formatter.py` + `test_reply_formatter.py` = **15/15
+green** (`py_compile` OK; `ResourceWarning` squashed). The formatter strips
+`<decide>/<verify>/<stop>` grammar tags, `thinking` blocks, duplicate refusals,
+and truncated/mangled token fragments (`<deside>`, unclosed `<stop>`) from the
+displayed output only — the model is untouched. Code-block indentation is
+preserved; empty-answer zones fall back to `…`; explicit "the answer is X"
+stems are salvaged rather than silenced. Regression tests lock the edge cases.
+
+## Stage 5 — Conversational serving
+
+**Status:** COMPLETE (2026-08-07). `server.py` (FastAPI) serves the v3 model at
+`http://127.0.0.1:8000/`, including a browser chat UI at `GET /`. `/chat` loads the
+weights lazily on the first request, then routes the raw Heartly grammar through
+`reply_formatter.format_reply(raw, mode='chat')`.
+
+- **Grammar strip:** removes `thinking` blocks and `<decide>/<verify>/<stop>` plus
+  mangled tag fragments — only the clean answer reaches the UI.
+- **Code-rendering fix:** the model emits in-code newlines as escaped text;
+  `_clean_text` unescapes them inside fenced code blocks, so code renders multi-line
+  instead of collapsing to one string.
+- **UI fix:** the chat `Send` button shipped `disabled` (permanent deadlock); the
+  attribute was removed and the button toggles only while streaming.
+- **Verified:** `GET /` returns the chat UI (HTTP 200); `POST /chat` with prompt
+  `What is 2+2?` returns `2 + 2 = 4`; a code prompt returns a fenced, multi-line block.
+- **Serving footprint:** CPU-only; 1.5 B params need no GPU for inference.
+
+## Phase 2 — Trillion-parameter scaling (Kimi k1.6) 📋
+
+**Status:** PLANNED (see `ROADMAP.md` "NEW OPTION E").
+
+Scaling Heartly to ~1 T params via Moonshot's open Kimi k1.6 instead of
+incrementally up the 1.5B→14B ladder. The Stage-5 SFT recipe transfers unchanged
+(`finetune_qwen.py` uses HF `AutoModelForCausalLM`/`AutoTokenizer` → the
+architecture is auto-resolved from the Kimi config). Recommended staging:
+**QLoRA r16/nf4** (~26 M trainable params, 4–8×B200) — train ~$35–90 (spot);
+serving 1 T params needs a multi-GPU vLLM shard (~$36–72/hr); the local
+`server.py`/llama-cpp path only fits the v3 1.5B GGUF. Open gates: exact HF repo
+id + fine-distributable license, dense vs MoE, and tokenizer overlap with
+Heartly markup.
+
+
+## Final live verification (2026-08-07)
+
+Re-spawned a fresh server (old pid 8604 killed so it served the updated
+`reply_formatter.py`); `heartly-qwen-code-v3` loaded in ~4 s.
+
+- `GET /health` -> `{"status":"ready","model":"heartly-qwen-code-v3"}`.
+- `GET /` -> HTTP 200 with the chat UI; the `Send` button has no static `disabled`
+  attribute and CSS `white-space:pre-wrap` preserves newlines (UI fix confirmed).
+- `POST /chat` code-rendering probe -- all 3 code prompts green:
+  `real_newlines=True, backslash_n_left=False`. Fenced `python` blocks render multi-line
+  with real line breaks -- the original one-line collapse is resolved in both the
+  grammar-stripping path and the browser UI.
+- HuggingFace (public): https://huggingface.co/eivintobias/heartly-qwen-code -- 8 files
+  at root (config.json, generation_config.json, tokenizer.json, tokenizer_config.json,
+  chat_template.jinja, model.safetensors 2.94 GB, README.md, .gitattributes);
+  `private=false`, `used_storage ~ 2.96 GB`, commits `034d0c4` (config/tokenizer),
+  `51098a1` (weights), `a60fa7a` (model-card README).
+- GitHub: commit `4fb6412` pushed to github.com/eivintobias/heartly (master); the 2.94 GB
+  weights stay git-ignored -- only code + docs are committed (16 files).

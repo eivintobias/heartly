@@ -28,10 +28,16 @@ from transformers import (
 def collate(batch, tok, max_length=768):
     """Collate function with loss masking on the response (prompt = -100)."""
     pad_id = tok.pad_token_id if tok.pad_token_id is not None else 0
+    eos_id = tok.eos_token_id
     input_ids, labels = [], []
     for item in batch:
         p = tok.encode(f"User: {item['instruction']}\nAssistant: ")
-        r = tok.encode(item["output"])
+        r = tok.encode(item["output"], add_special_tokens=False)
+        # Heartly's <stop> marker is ordinary multi-token text. Append the
+        # model's real EOS token so llama.cpp/LM Studio stops natively after
+        # the marker instead of continuing into unrelated pretrained text.
+        if eos_id is not None and (not r or r[-1] != eos_id):
+            r.append(eos_id)
         ids = (p + r)[:max_length]
         lab = ([-100] * len(p) + r)[:max_length]
         pad = max_length - len(ids)
@@ -109,6 +115,8 @@ def main():
     ap.add_argument("--max-length", type=int, default=512)
     ap.add_argument("--limit", type=int, default=0, help="debug: first N samples")
     ap.add_argument("--qlora", action="store_true", help="Use QLoRA instead of full fine-tune")
+    ap.add_argument("--adapter", default=None,
+                    help="Continue training from an existing PEFT/LoRA adapter directory")
     ap.add_argument("--dtype", default="fp16", choices=["fp32", "bf16", "fp16"])
     args = ap.parse_args()
 
@@ -129,7 +137,7 @@ def main():
 
     # For QLoRA on 11GB: 4-bit quantization
     quantization_config = None
-    if args.qlora:
+    if args.qlora or args.adapter:
         print("[QLoRA] Loading with 4-bit quantization")
         quantization_config = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -142,15 +150,20 @@ def main():
         args.repo,
         torch_dtype=torch_dtype,
         quantization_config=quantization_config,
-        device_map="auto" if args.qlora else None,
+        device_map="auto" if (args.qlora or args.adapter) else None,
     )
 
     # Freeze layers (not needed with QLoRA since LoRA is parameter-efficient)
-    if not args.qlora:
+    if not args.qlora and not args.adapter:
         freeze_embeddings_and_layers(model, args.freeze_layers)
 
-    # Apply QLoRA if requested
-    if args.qlora:
+    # Continue an existing adapter, or create a fresh QLoRA adapter.
+    if args.adapter:
+        from peft import PeftModel
+        print(f"[QLoRA] Continuing adapter from {args.adapter}")
+        model = PeftModel.from_pretrained(model, args.adapter, is_trainable=True)
+        model.print_trainable_parameters()
+    elif args.qlora:
         model = setup_qlora(model)
 
     # Dataset + Trainer
